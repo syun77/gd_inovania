@@ -14,3 +14,12 @@ config/name="gd_inovania"
 run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
+
+[layer_names]
+
+2d_physics/layer_1="Player"
+2d_physics/layer_2="Floor"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
