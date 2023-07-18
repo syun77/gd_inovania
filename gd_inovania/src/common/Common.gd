@@ -138,6 +138,9 @@ func gain_item(id:Map.eItem) -> void:
 
 ## BGMの再生.
 func play_bgm(name:String) -> void:
+	print("TODO: 未実装 play_bgm()")
+	return
+	
 	if not name in _bgm_tbl:
 		push_error("存在しないサウンド %s"%name)
 		return
@@ -150,6 +153,9 @@ func stop_bgm() -> void:
 
 ## SEの再生.
 func play_se(name:String, id:int=0) -> void:
+	print("TODO: 未実装 play_se()")
+	return
+	
 	if id < 0 or MAX_SOUND <= id:
 		push_error("不正なサウンドID %d"%id)
 		return

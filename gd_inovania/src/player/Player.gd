@@ -73,8 +73,6 @@ var _jump_cnt = 0
 var _jump_cnt_max = 1
 ## 獲得したアイテム.
 var _itemID:Map.eItem = Map.eItem.NONE
-## ジャンプ開始座標.
-var _jump_start_y = 0.0
 
 # ---------------------------------
 # public functions.
@@ -121,17 +119,10 @@ func update(delta: float) -> void:
 # ---------------------------------
 func _ready() -> void:
 	hp = _config.hp_init
-	if Common.is_lunker:
-		hp = 1 # ランカーモードの初期HPは1.
-		_jump_cnt_max = 2 # 追加ジャンプが可能.
-		_jump_start_y = position.y
 	max_hp = hp
 	_spr.flip_h = _is_right
 	
 	var frame = 0
-	if Common.is_lunker:
-		# ランカーモード.
-		frame += OFS_SPR_LUNKER
 	_spr.frame = frame
 
 ## 更新 > 開始.
@@ -161,17 +152,6 @@ func _update_main(delta:float) -> void:
 		_jump_scale_timer = JUMP_SCALE_TIME
 		_jump_cnt = 0 # ジャンプ回数をリセット.
 		
-		if Common.is_lunker:
-			# ランカーモードは落下ダメージがある.
-			if position.y - _jump_start_y > LUNKER_JUMP_DAMAGE1:
-				_is_damage = true
-			if position.y - _jump_start_y > LUNKER_JUMP_DAMAGE2:
-				_is_damage = true
-				_damage_power = 99 # 即死.
-		
-		# 高さを記憶.
-		_jump_start_y = position.y
-
 	_is_landing = is_on_floor()
 	
 	_update_jump_scale_anim(delta)
@@ -181,10 +161,6 @@ func _update_main(delta:float) -> void:
 	
 	_update_collision_post()
 	
-	if Common.is_lunker:
-		# ランカーモードの補助用描画.
-		queue_redraw()
-
 ## 更新 > 死亡.
 func _update_dead(delta:float) -> void:
 	# タイマー関連の更新.
@@ -266,9 +242,6 @@ func _update_moving() -> void:
 		_jump_cnt += 1 # ジャンプ回数を増やす.
 		_jump_scale = eJumpScale.JUMPING
 		_jump_scale_timer = JUMP_SCALE_TIME
-		# ジャンプした高さを記憶.
-		_jump_start_y = position.y
-
 	
 	# 左右移動の更新.
 	_update_horizontal_moving()
@@ -360,10 +333,6 @@ func _get_anim(is_dead:bool) -> int:
 		var t = int(_timer_anim * 8)
 		ret = ANIM_NORMAL_TBL[t%2]
 	
-	if Common.is_lunker:
-		# ランカーモードはオフセットする.
-		ret += OFS_SPR_LUNKER
-	
 	return ret
 
 ## コリジョンレイヤーの更新.
@@ -442,26 +411,6 @@ func _update_debug() -> void:
 	_label.text = "stomp:%d"%_stomp_tile
 	_label.text += "\nis_floor:%s"%("true" if is_on_floor() else "false")
 	_label.text += "\n" + str(get_floor_normal())
-
-func _draw() -> void:
-	if Common.is_lunker == false:
-		return # ランカーモードでなければ描画しない.
-	if Common.is_lunker_support == false:
-		return # 補助線が無効.
-	if _is_landing:
-		return # 着地中は描画しない.
-	
-	var center = Vector2(0, _jump_start_y - position.y)
-	var idx = 0
-	var cols = [Color.YELLOW, Color.RED]
-	for dy in [LUNKER_JUMP_DAMAGE1, LUNKER_JUMP_DAMAGE2]:
-		var p1 = center + Vector2(-1024, dy)
-		var rect = Rect2(p1, Vector2(2048, 1024))
-		var c = cols[idx]
-		c.a = 0.2
-		draw_rect(rect, c)
-		idx += 1
-		
 
 # ---------------------------------
 # properties.
