@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Config" load_steps=2 format=3 uid="uid://bj8yvefvrxmu"]
+
+[ext_resource type="Script" path="res://src/common/Config.gd" id="1_1vnu2"]
+
+[resource]
+script = ExtResource("1_1vnu2")
+hp_init = 3
+move_speed = 480.0
+ground_acc_ratio = 0.04
+air_acc_ratio = 0.01
+jump_velocity = 960.0
+gravity = 48.0
+fall_speed_max = 400.0
+life_ratio = 6.66667
+muteki_time = 0.833333
+scroll_panel_speed = 400.0
