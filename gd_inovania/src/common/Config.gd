@@ -26,6 +26,8 @@ const FPS = 60
 @export var life_ratio = 400.0 / FPS # 6.666sec
 ## ダメージ時の無敵タイマー.
 @export var muteki_time = 50.0 / 60.0 # 0.8333sec
+## デバッグ用に左右移動を停止するフラグ
+@export var can_stop = true
 
 # ---------------------------------
 @export_category("地形")

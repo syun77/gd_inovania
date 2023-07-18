@@ -284,12 +284,18 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 	else:
 		_direction = 0
 
+	var dir = _direction
+	if _config.can_stop:
+		# デバッグ用に止まれる.
+		if Input.get_axis("ui_left", "ui_right") == 0:
+			dir = 0
+
 	var MOVE_SPEED = _config.move_speed
 	var AIR_ACC_RATIO = _config.air_acc_ratio
 	
 	if is_on_floor() == false:
 		# 空中移動.
-		velocity.x = velocity.x * (1.0 - AIR_ACC_RATIO) + _direction * MOVE_SPEED * AIR_ACC_RATIO
+		velocity.x = velocity.x * (1.0 - AIR_ACC_RATIO) + dir * MOVE_SPEED * AIR_ACC_RATIO
 		return
 
 	# 地上の移動.
@@ -301,11 +307,11 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 	# 踏んでいるタイルごとの処理.
 	match _stomp_tile:
 		Map.eType.NONE: # 普通の床.
-			velocity.x = base + _direction * MOVE_SPEED * GROUND_ACC_RATIO
+			velocity.x = base + dir * MOVE_SPEED * GROUND_ACC_RATIO
 		Map.eType.SCROLL_L: # ベルト床(左).
-			velocity.x = base + (_direction * MOVE_SPEED - SCROLLPANEL_SPEED) * GROUND_ACC_RATIO
+			velocity.x = base + (dir * MOVE_SPEED - SCROLLPANEL_SPEED) * GROUND_ACC_RATIO
 		Map.eType.SCROLL_R: # ベルト床(右).
-			velocity.x = base + (_direction * MOVE_SPEED + SCROLLPANEL_SPEED) * GROUND_ACC_RATIO
+			velocity.x = base + (dir * MOVE_SPEED + SCROLLPANEL_SPEED) * GROUND_ACC_RATIO
 		Map.eType.SLIP: # すべる床.
 			pass # 地上では加速できない.
 
