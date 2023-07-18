@@ -49,21 +49,7 @@ static func check_all() -> void:
 				
 ## 実績開放チェック.
 static func check(id:eType) -> bool:
-	match id:
-		eType.NORMAL_COMPLETED:
-			return check_normal_completed()
-		eType.MIN_COMPLETED:
-			return Common.count_item() == 3
-		eType.FAKE_COMPLETED:
-			return Common.count_item() == 18
-		eType.ALL_COMPLETED:
-			return Common.count_item() == 19
-		eType.SPEEDRUN_40SEC:
-			return Common.get_past_time_sec() <= 40
-		eType.SPEEDRUN_60SEC:
-			return Common.get_past_time_sec() <= 60
-
-	assert(0, "未定義の実績:%d"%id)	
+	assert(false, "未定義の実績:%d"%id)	
 	return false
 	
 ## 通常クリアチェック.

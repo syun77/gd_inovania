@@ -86,8 +86,8 @@ func is_dead() -> bool:
 	return _state == eState.DEAD
 	
 ## アイテム獲得.
-func gain_item(itemID:Map.eItem) -> void:
-	_itemID = itemID
+func gain_item(id:Map.eItem) -> void:
+	_itemID = id
 	match _itemID:
 		Map.eItem.JUMP_UP:
 			_jump_cnt_max += 1 # ジャンプ最大数アップ.
@@ -177,7 +177,7 @@ func _update_dead(delta:float) -> void:
 	_update_jump_scale_anim(delta)
 	
 	# アニメーションを更新.
-	_spr.frame = _get_anim(true)
+	_spr.frame = _get_anim()
 	
 ## HP回復処理.
 func _update_recovery(delta:float) -> void:
@@ -325,14 +325,14 @@ func _update_anim() -> void:
 	# 向きを更新.
 	_is_right = (_direction >= 0.0)
 	_spr.flip_h = _is_right
-	_spr.frame = _get_anim(false)
+	_spr.frame = _get_anim()
 
 ## アニメーションフレーム番号を取得する.
-func _get_anim(is_dead:bool) -> int:
+func _get_anim() -> int:
 	var ret = 0
 	if is_dead():
 		# 死亡.
-		var idx = (_cnt/7)%4
+		var idx = int(_cnt/7.0)%4
 		ret = ANIM_DEAD_TBL[idx]
 	else:
 		# 通常.

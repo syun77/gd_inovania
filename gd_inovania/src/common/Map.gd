@@ -157,12 +157,12 @@ static func world_to_grid(world:Vector2, centered=true) -> Vector2:
 static func world_to_grid_x(wx:float, centered:bool) -> float:
 	var size = get_tile_size()
 	if centered:
-		wx -= size / 2
+		wx -= size / 2.0
 	return (wx-OFS_X) / size
 static func world_to_grid_y(wy:float, centered:bool) -> float:
 	var size = get_tile_size()
 	if centered:
-		wy -= size / 2
+		wy -= size / 2.0
 	return (wy-OFS_Y) / size
 
 ## グリッド座標をワールド座標に変換する.
@@ -175,13 +175,13 @@ static func grid_to_world_x(gx:float, centered:bool) -> float:
 	var size = get_tile_size()
 	var x = OFS_X + (gx * size)
 	if centered:
-		x += size / 2 # 中央に移動.
+		x += size / 2.0 # 中央に移動.
 	return x
 static func grid_to_world_y(gy:float, centered:bool) -> float:
 	var size = get_tile_size()
 	var y = OFS_Y + (gy * size)
 	if centered:
-		y += size / 2 # 中央に移動.
+		y += size / 2.0 # 中央に移動.
 	return y
 
 ## マウスカーソルの位置をグリッド座標で取得する.
@@ -189,8 +189,8 @@ static func get_grid_mouse_pos(viewport:Viewport) -> Vector2i:
 	var mouse = viewport.get_mouse_position()
 	# 中央揃えしない.
 	return world_to_grid(mouse, false)
-static func get_mouse_pos(viewport:Viewport, snapped:bool=false) -> Vector2:
-	if snapped == false:
+static func get_mouse_pos(viewport:Viewport, is_snap:bool=false) -> Vector2:
+	if is_snap == false:
 		# スナップしない場合は viewport そのままの値.
 		return viewport.get_mouse_position()
 	# スナップする場合はいったんグリッド座標に変換.

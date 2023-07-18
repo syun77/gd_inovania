@@ -137,14 +137,11 @@ func gain_item(id:Map.eItem) -> void:
 ## 収集アイテム
 
 ## BGMの再生.
-func play_bgm(name:String) -> void:
-	print("TODO: 未実装 play_bgm()")
-	return
-	
-	if not name in _bgm_tbl:
-		push_error("存在しないサウンド %s"%name)
+func play_bgm(key:String) -> void:
+	if not key in _bgm_tbl:
+		push_error("存在しないサウンド %s"%key)
 		return
-	_bgm.stream = load(_bgm_tbl[name])
+	_bgm.stream = load(_bgm_tbl[key])
 	_bgm.play()
 
 ## BGMの停止.
@@ -152,20 +149,17 @@ func stop_bgm() -> void:
 	_bgm.stop()
 
 ## SEの再生.
-func play_se(name:String, id:int=0) -> void:
-	print("TODO: 未実装 play_se()")
-	return
-	
+func play_se(key:String, id:int=0) -> void:
 	if id < 0 or MAX_SOUND <= id:
 		push_error("不正なサウンドID %d"%id)
 		return
 	
-	if not name in _snd_tbl:
-		push_error("存在しないサウンド %s"%name)
+	if not key in _snd_tbl:
+		push_error("存在しないサウンド %s"%key)
 		return
 	
 	var snd = _snds[id]
-	snd.stream = load(_snd_tbl[name])
+	snd.stream = load(_snd_tbl[key])
 	snd.play()
 	
 ## 実績の開放.
