@@ -1,7 +1,8 @@
-extends Node
 # ========================================
 # Tilemapのラッパーモジュール.
 # ========================================
+class_name Map
+
 # --------------------------------------------------
 # const.
 # --------------------------------------------------
@@ -91,7 +92,7 @@ enum eItemType {
 	POWER_UP, # パワーアップ系.
 }
 
-func get_item_type(id:eItem) -> eItemType:
+static func get_item_type(id:eItem) -> eItemType:
 	if eItem.FUJI <= id and id <= eItem.V:
 		return eItemType.FUJI
 	if eItem.TAKA <= id and id <= eItem.KATAKATA:
@@ -105,7 +106,7 @@ func get_item_type(id:eItem) -> eItemType:
 	
 	return eItemType.POWER_UP
 
-func item_to_color(id:eItem) -> Color:
+static func item_to_color(id:eItem) -> Color:
 	var ret = Color.WHITE
 	match get_item_type(id):
 		eItemType.FUJI:
@@ -121,62 +122,62 @@ func item_to_color(id:eItem) -> Color:
 		_:
 			ret = Color.YELLOW
 
-	if Item.is_rare(id) == false:
-		# レア系意外は暗くする.
-		ret = ret.lerp(Color.BLACK, 0.5)	
+	#if Item.is_rare(id) == false:
+	#	# レア系意外は暗くする.
+	#	ret = ret.lerp(Color.BLACK, 0.5)	
 	
 	return ret
 # --------------------------------------------------
 # private var.
 # --------------------------------------------------
-var _tilemap:TileMap = null
-var _width:int = 0
-var _height:int = 0
+static var _tilemap:TileMap = null
+static var _width:int = 0
+static var _height:int = 0
 
 # --------------------------------------------------
 # public functions.
 # --------------------------------------------------
 ## タイルマップを設定.
-func setup(tilemap:TileMap, w:int, h:int) -> void:
+static func setup(tilemap:TileMap, w:int, h:int) -> void:
 	_tilemap = tilemap
 	_width = w
 	_height = h
 
 ## タイルサイズを取得する.
-func get_tile_size() -> int:
+static func get_tile_size() -> int:
 	# 正方形なので xの値 でOK.
 	return _tilemap.tile_set.tile_size.x
 
 ## ワールド座標をグリッド座標に変換する.
-func world_to_grid(world:Vector2, centered=true) -> Vector2:
+static func world_to_grid(world:Vector2, centered=true) -> Vector2:
 	var grid = Vector2()
 	grid.x = world_to_grid_x(world.x, centered)
 	grid.y = world_to_grid_y(world.y, centered)
 	return grid
-func world_to_grid_x(wx:float, centered:bool) -> float:
+static func world_to_grid_x(wx:float, centered:bool) -> float:
 	var size = get_tile_size()
 	if centered:
 		wx -= size / 2
 	return (wx-OFS_X) / size
-func world_to_grid_y(wy:float, centered:bool) -> float:
+static func world_to_grid_y(wy:float, centered:bool) -> float:
 	var size = get_tile_size()
 	if centered:
 		wy -= size / 2
 	return (wy-OFS_Y) / size
 
 ## グリッド座標をワールド座標に変換する.
-func grid_to_world(grid:Vector2, centered:bool) -> Vector2:
+static func grid_to_world(grid:Vector2, centered:bool) -> Vector2:
 	var world = Vector2()
 	world.x = grid_to_world_x(grid.x, centered)
 	world.y = grid_to_world_y(grid.y, centered)
 	return world
-func grid_to_world_x(gx:float, centered:bool) -> float:
+static func grid_to_world_x(gx:float, centered:bool) -> float:
 	var size = get_tile_size()
 	var x = OFS_X + (gx * size)
 	if centered:
 		x += size / 2 # 中央に移動.
 	return x
-func grid_to_world_y(gy:float, centered:bool) -> float:
+static func grid_to_world_y(gy:float, centered:bool) -> float:
 	var size = get_tile_size()
 	var y = OFS_Y + (gy * size)
 	if centered:
@@ -184,44 +185,44 @@ func grid_to_world_y(gy:float, centered:bool) -> float:
 	return y
 
 ## マウスカーソルの位置をグリッド座標で取得する.
-func get_grid_mouse_pos() -> Vector2i:
-	var mouse = get_viewport().get_mouse_position()
+static func get_grid_mouse_pos(viewport:Viewport) -> Vector2i:
+	var mouse = viewport.get_mouse_position()
 	# 中央揃えしない.
 	return world_to_grid(mouse, false)
-func get_mouse_pos(snapped:bool=false) -> Vector2:
+static func get_mouse_pos(viewport:Viewport, snapped:bool=false) -> Vector2:
 	if snapped == false:
 		# スナップしない場合は viewport そのままの値.
-		return get_viewport().get_mouse_position()
+		return viewport.get_mouse_position()
 	# スナップする場合はいったんグリッド座標に変換.
-	var pos = get_grid_mouse_pos()
+	var pos = get_grid_mouse_pos(viewport)
 	# ワールドに戻すことでスナップされる.
 	return grid_to_world(pos, true)
 	
 ## 指定の位置にあるタイル消す.
-func erase_cell(pos:Vector2i, tile_layer:eTileLayer) -> void:
+static func erase_cell(pos:Vector2i, tile_layer:eTileLayer) -> void:
 	_tilemap.erase_cell(tile_layer, pos)
 
 ## 床の種別を取得する.
-func get_floor_type(world:Vector2) -> eType:
+static func get_floor_type(world:Vector2) -> eType:
 	var ret = get_custom_data_from_world(world, "type")
 	if ret == null:
 		return eType.NONE
 	return ret
 	
 ## アイテムの種類を取得する.
-func get_item(pos:Vector2i) -> eItem:
+static func get_item(pos:Vector2i) -> eItem:
 	var ret = get_custom_data(pos, "item")
 	if ret == null:
 		return eItem.NONE
 	return ret
 	
 ## カスタムデータを取得する (ワールド座標指定).
-func get_custom_data_from_world(world:Vector2, key:String) -> Variant:
+static func get_custom_data_from_world(world:Vector2, key:String) -> Variant:
 	var pos:Vector2i = world_to_grid(world, false)
 	return get_custom_data(pos, key)
 
 ## カスタムデータを取得する.
-func get_custom_data(pos:Vector2i, key:String) -> Variant:
+static func get_custom_data(pos:Vector2i, key:String) -> Variant:
 	for layer in eTileLayer.values():
 		var data = _tilemap.get_cell_tile_data(layer, pos)
 		if data == null:
@@ -239,10 +240,10 @@ func get_custom_data(pos:Vector2i, key:String) -> Variant:
 # properties.
 # --------------------------------------------------
 ## 幅 (read only)
-var width:int = 0:
+static var width:int = 0:
 	get:
 		return _width
 ## 高さ (read only)
-var height:int = 0:
+static var height:int = 0:
 	get:
 		return _height
