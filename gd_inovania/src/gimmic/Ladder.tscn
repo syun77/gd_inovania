@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://cieo8bmyfskl2"]
+
+[ext_resource type="Script" path="res://src/gimmic/Ladder.gd" id="1_rymdb"]
+[ext_resource type="Texture2D" uid="uid://b548sosi6o8xv" path="res://assets/images/ladder.png" id="2_fy6r0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_haf5t"]
+size = Vector2(64, 64)
+
+[node name="Ladder" type="Area2D"]
+collision_layer = 4
+script = ExtResource("1_rymdb")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+scale = Vector2(4, 4)
+texture = ExtResource("2_fy6r0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_haf5t")

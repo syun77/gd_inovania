@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://w7g5p3p3ldbw"]
+[gd_scene load_steps=5 format=3 uid="uid://w7g5p3p3ldbw"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_ohpg3"]
 [ext_resource type="TileSet" uid="uid://bj4w75hx8d420" path="res://assets/tiles/tile_set.tres" id="1_siuqx"]
 [ext_resource type="PackedScene" uid="uid://ch0yf5nkshbib" path="res://src/player/Player.tscn" id="2_cqxvx"]
+[ext_resource type="PackedScene" uid="uid://cieo8bmyfskl2" path="res://src/gimmic/Ladder.tscn" id="3_lpowu"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ohpg3")
@@ -15,9 +16,14 @@ format = 2
 layer_0/name = "BackGround"
 layer_0/tile_data = PackedInt32Array(0, 65536, 0, 1, 65536, 0, 2, 65536, 0, 3, 65536, 0, 4, 65536, 0, 5, 65536, 0, 6, 65536, 0, 7, 65536, 0, 8, 65536, 0, 9, 65536, 0, 10, 65536, 0, 11, 65536, 0, 12, 65536, 0, 13, 65536, 0, 14, 65536, 0, 15, 65536, 0, 16, 65536, 0, 17, 65536, 0, 65553, 65536, 0, 131089, 65536, 0, 196625, 65536, 0, 262161, 65536, 0, 327697, 65536, 0, 393233, 65536, 0, 458769, 65536, 0, 524305, 65536, 0, 589841, 65536, 0, 589824, 65536, 0, 589825, 65536, 0, 589826, 65536, 0, 589827, 65536, 0, 589828, 65536, 0, 589829, 65536, 0, 589830, 65536, 0, 589831, 65536, 0, 589832, 65536, 0, 589833, 65536, 0, 589834, 65536, 0, 589835, 65536, 0, 589836, 65536, 0, 589837, 65536, 0, 589838, 65536, 0, 589839, 65536, 0, 589840, 65536, 0, 65536, 65536, 0, 131072, 65536, 0, 196608, 65536, 0, 262144, 65536, 0, 327680, 65536, 0, 393216, 65536, 0, 458752, 65536, 0, 524288, 65536, 0)
 
+[node name="Ladder" parent="BgLayer" instance=ExtResource("3_lpowu")]
+position = Vector2(544, 448)
+scale = Vector2(1, 4)
+
 [node name="MainLayer" type="CanvasLayer" parent="."]
 
 [node name="Player" parent="MainLayer" instance=ExtResource("2_cqxvx")]
 position = Vector2(408, 384)
 
 [node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(576, 324)
