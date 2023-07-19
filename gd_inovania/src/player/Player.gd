@@ -20,6 +20,13 @@ enum eState {
 	DEAD,
 }
 
+## 移動状態.
+enum eMoveState {
+	LANDING, # 地上.
+	AIR, # 空中.
+	GRABBING_LADDER, # はしごに掴まっている
+}
+
 ## ジャンプスケール.
 enum eJumpScale {
 	NONE,
@@ -42,6 +49,8 @@ enum eJumpScale {
 # ---------------------------------
 ## 状態.
 var _state = eState.READY
+## 移動状態.
+var _move_state = eMoveState.AIR
 ## アニメーション用タイマー.
 var _timer_anim = 0.0
 ## フレームカウンタ.
@@ -50,8 +59,6 @@ var _cnt = 0
 var _timer_muteki = 0.0
 ## 右向きかどうか.
 var _is_right = true # 左向きで開始.
-## 着地しているかどうか.
-var _is_landing = false
 ## 飛び降り中かどうか.
 var _is_fall_through = false
 ## 方向.
@@ -156,17 +163,18 @@ func _update_main(delta:float) -> void:
 
 	move_and_slide()
 	
-	if _is_landing == false and is_on_floor():
+	if _is_landing() == false and is_on_floor():
 		# 着地した瞬間.
 		_jump_scale = eJumpScale.LANDING
 		_jump_scale_timer = JUMP_SCALE_TIME
 		_jump_cnt = 0 # ジャンプ回数をリセット.
-		
-	_is_landing = is_on_floor()
+	
+	# 移動状態の更新.
+	_update_move_state()
 	
 	_update_jump_scale_anim(delta)
 	
-	if is_on_floor():
+	if _is_landing():
 		_set_fall_through(false) # 着地したら飛び降り終了.
 	
 	_update_collision_post()
@@ -228,11 +236,21 @@ func _update_moving() -> void:
 				_state = eState.DEAD
 			return
 	
-	# move_and_slide()で足元のタイルを判定したいので
-	# 常に重力を加算.
-	velocity.y += _config.gravity
+	if _is_grabbing_ladder() == false:
+		# はしご以外
+		# move_and_slide()で足元のタイルを判定したいので
+		# 常に重力を加算.
+		velocity.y += _config.gravity
 	
-	if _is_fall_through:
+	if _is_grabbing_ladder():
+		# 上下ではしご移動.
+		var v = Input.get_axis("ui_up", "ui_down")
+		if v != 0:
+			velocity.x = 0 # X方向を止める.
+			velocity.y = 500 * v
+		else:
+			velocity.y = 0
+	elif _is_fall_through:
 		# 飛び降り中.
 		if _check_fall_through() == false:
 			# 飛び降り終了.
@@ -424,6 +442,35 @@ func _update_jump_scale_anim(delta:float) -> void:
 # はしごを掴めるかどうか.
 func _can_grab_ladder() -> bool:
 	return _ladder_count > 0
+	
+# 移動状態の更新.
+func _update_move_state() -> void:
+	match _move_state:
+		eMoveState.GRABBING_LADDER:
+			if _can_grab_ladder() == false:
+				# はしごから離れた.
+				_move_state = eMoveState.AIR
+		eMoveState.AIR:
+			if is_on_floor():
+				_move_state = eMoveState.LANDING
+		eMoveState.LANDING:
+			if is_on_floor() == false:
+				_move_state = eMoveState.AIR
+	
+	if _is_grabbing_ladder() == false:
+		# はしごチェック.
+		if _can_grab_ladder():
+			if Input.get_axis("ui_up", "ui_down") != 0:
+				# はしご開始.
+				_move_state = eMoveState.GRABBING_LADDER
+	
+# 着地しているかどうか.
+func _is_landing() -> bool:
+	return _move_state == eMoveState.LANDING
+
+# はしごを掴んでいるかどうか.
+func _is_grabbing_ladder() -> bool:
+	return _move_state == eMoveState.GRABBING_LADDER
 
 # デバッグ用更新.
 func _update_debug() -> void:
