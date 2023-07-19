@@ -73,6 +73,8 @@ var _jump_cnt = 0
 var _jump_cnt_max = 1
 ## 獲得したアイテム.
 var _itemID:Map.eItem = Map.eItem.NONE
+## はしご接触数.
+var _ladder_count = 0
 
 # ---------------------------------
 # public functions.
@@ -113,6 +115,14 @@ func update(delta: float) -> void:
 	
 	# デバッグ用更新.
 	#_update_debug()
+	
+## はしご接触数のカウント
+func increase_ladder_count() -> void:
+	_ladder_count += 1
+	print("ladder count:%d"%_ladder_count)
+func decrease_ladder_count() -> void:
+	_ladder_count -= 1
+	print("ladder count:%d"%_ladder_count)
 
 # ---------------------------------
 # private functions.
@@ -410,6 +420,10 @@ func _update_jump_scale_anim(delta:float) -> void:
 			# もとに戻す
 			_spr.scale.x = 1
 			_spr.scale.y = 1
+
+# はしごを掴めるかどうか.
+func _can_grab_ladder() -> bool:
+	return _ladder_count > 0
 
 # デバッグ用更新.
 func _update_debug() -> void:
