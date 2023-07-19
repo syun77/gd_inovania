@@ -165,9 +165,7 @@ func _update_main(delta:float) -> void:
 	
 	if _is_landing() == false and is_on_floor():
 		# 着地した瞬間.
-		_jump_scale = eJumpScale.LANDING
-		_jump_scale_timer = JUMP_SCALE_TIME
-		_jump_cnt = 0 # ジャンプ回数をリセット.
+		_just_landing(true)
 	
 	# 移動状態の更新.
 	_update_move_state()
@@ -197,6 +195,15 @@ func _update_dead(delta:float) -> void:
 	
 	# アニメーションを更新.
 	_spr.frame = _get_anim()
+
+## 着地した瞬間.
+func _just_landing(is_scale_anim:bool) -> void:
+	if is_scale_anim:
+		# 着地演出.
+		_jump_scale = eJumpScale.LANDING
+		_jump_scale_timer = JUMP_SCALE_TIME
+	_jump_cnt = 0 # ジャンプ回数をリセット.
+
 	
 ## HP回復処理.
 func _update_recovery(delta:float) -> void:
@@ -251,8 +258,11 @@ func _update_moving() -> void:
 			velocity.y = 300 * v
 		else:
 			velocity.y = 0
-			
-	if _is_fall_through:
+		if _check_jump():
+			# ジャンプ開始.
+			_start_jump()
+			_move_state = eMoveState.AIR
+	elif _is_fall_through:
 		# 飛び降り中.
 		if _check_fall_through() == false:
 			# 飛び降り終了.
@@ -336,7 +346,7 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 	var MOVE_SPEED = _config.move_speed
 	var AIR_ACC_RATIO = _config.air_acc_ratio
 	
-	if _is_in_the_air() == false:
+	if _is_in_the_air():
 		# 空中移動.
 		velocity.x = velocity.x * (1.0 - AIR_ACC_RATIO) + dir * MOVE_SPEED * AIR_ACC_RATIO
 		return
@@ -481,6 +491,8 @@ func _update_move_state() -> void:
 			if Input.get_axis("ui_up", "ui_down") != 0:
 				# はしご開始.
 				_move_state = eMoveState.GRABBING_LADDER
+				# 着地 (着地アニメなし)
+				_just_landing(false)
 	
 # 着地しているかどうか.
 func _is_landing() -> bool:
