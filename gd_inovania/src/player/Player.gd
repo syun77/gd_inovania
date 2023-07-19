@@ -121,7 +121,7 @@ func update(delta: float) -> void:
 			_update_dead(delta)
 	
 	# デバッグ用更新.
-	#_update_debug()
+	_update_debug()
 	
 ## はしご接触数のカウント
 func increase_ladder_count() -> void:
@@ -248,10 +248,11 @@ func _update_moving() -> void:
 		var v = Input.get_axis("ui_up", "ui_down")
 		if v != 0:
 			velocity.x = 0 # X方向を止める.
-			velocity.y = 500 * v
+			velocity.y = 300 * v
 		else:
 			velocity.y = 0
-	elif _is_fall_through:
+			
+	if _is_fall_through:
 		# 飛び降り中.
 		if _check_fall_through() == false:
 			# 飛び降り終了.
@@ -264,25 +265,25 @@ func _update_moving() -> void:
 		velocity.x = 0
 		return
 
-	elif _checkJump():
-		# 接地していたらジャンプ.
-		velocity.y = _config.jump_velocity * -1
-		Common.play_se("jump")
-		_jump_cnt += 1 # ジャンプ回数を増やす.
-		_jump_scale = eJumpScale.JUMPING
-		_jump_scale_timer = JUMP_SCALE_TIME
+	elif _check_jump():
+		# ジャンプする.
+		_start_jump()
 	
 	# 左右移動の更新.
 	_update_horizontal_moving()
 
 ## ジャンプチェック.
-func _checkJump() -> bool:
+func _check_jump() -> bool:
 	if Input.is_action_just_pressed("action") == false:
 		# ジャンプボタンを押していない.
 		return false
 	if _jump_cnt >= _jump_cnt_max:
 		# ジャンプ最大回数を超えた.
 		return false
+	
+	if _is_grabbing_ladder():
+		# はしご掴まっていればジャンプできる.
+		return true
 	
 	if _jump_cnt == 0:
 		if is_on_floor() == false:
@@ -294,6 +295,19 @@ func _checkJump() -> bool:
 		
 	# ジャンプする.
 	return true
+
+## ジャンプ開始.
+func _start_jump() -> void:
+	velocity.y = _config.jump_velocity * -1
+	Common.play_se("jump")
+	
+	# 空中状態にする.
+	_move_state = eMoveState.AIR
+	
+	_jump_cnt += 1 # ジャンプ回数を増やす.
+	_jump_scale = eJumpScale.JUMPING
+	_jump_scale_timer = JUMP_SCALE_TIME
+
 	
 ## 飛び降り判定.
 func _check_fall_through() -> bool:
@@ -483,10 +497,7 @@ func _is_grabbing_ladder() -> bool:
 # デバッグ用更新.
 func _update_debug() -> void:
 	_label.visible = true
-	_label.text = "stomp:%d"%_stomp_tile
-	_label.text += "\nis_floor:%s"%("true" if is_on_floor() else "false")
-	_label.text += "\n" + str(get_floor_normal())
-
+	_label.text = "move:%s"%(eMoveState.keys()[_move_state])
 # ---------------------------------
 # properties.
 # ---------------------------------
