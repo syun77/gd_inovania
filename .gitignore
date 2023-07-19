@@ -6,6 +6,7 @@
 export.cfg
 export_presets.cfg
 *.import
+*.avi
 
 # Imported translations (automatically generated from CSV files)
 *.translation

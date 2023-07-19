@@ -172,6 +172,7 @@ func _update_main(delta:float) -> void:
 	# 移動状態の更新.
 	_update_move_state()
 	
+	# スケールアニメの更新
 	_update_jump_scale_anim(delta)
 	
 	if _is_landing():
@@ -321,7 +322,7 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 	var MOVE_SPEED = _config.move_speed
 	var AIR_ACC_RATIO = _config.air_acc_ratio
 	
-	if is_on_floor() == false:
+	if _is_in_the_air() == false:
 		# 空中移動.
 		velocity.x = velocity.x * (1.0 - AIR_ACC_RATIO) + dir * MOVE_SPEED * AIR_ACC_RATIO
 		return
@@ -450,6 +451,9 @@ func _update_move_state() -> void:
 			if _can_grab_ladder() == false:
 				# はしごから離れた.
 				_move_state = eMoveState.AIR
+				velocity.y = 0
+			elif is_on_floor():
+				_move_state = eMoveState.LANDING
 		eMoveState.AIR:
 			if is_on_floor():
 				_move_state = eMoveState.LANDING
@@ -467,6 +471,10 @@ func _update_move_state() -> void:
 # 着地しているかどうか.
 func _is_landing() -> bool:
 	return _move_state == eMoveState.LANDING
+	
+# 空中かどうか.
+func _is_in_the_air() -> bool:
+	return _move_state == eMoveState.AIR
 
 # はしごを掴んでいるかどうか.
 func _is_grabbing_ladder() -> bool:

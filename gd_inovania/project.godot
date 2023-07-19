@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 Common="*res://src/common/Common.gd"
 Ease="*res://src/common/Ease.gd"
 
+[editor]
+
+movie_writer/movie_file="../movie.avi"
+
 [input]
 
 action={
