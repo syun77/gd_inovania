@@ -25,6 +25,7 @@ enum eMoveState {
 	LANDING, # 地上.
 	AIR, # 空中.
 	GRABBING_LADDER, # はしごに掴まっている
+	CLIMBING_WALL, # 壁登り中.
 }
 
 ## ジャンプスケール.
@@ -244,14 +245,13 @@ func _update_moving() -> void:
 				_state = eState.DEAD
 			return
 	
-	if _is_grabbing_ladder() == false:
-		# はしご以外
+	if _is_add_gravity():
 		# move_and_slide()で足元のタイルを判定したいので
 		# 常に重力を加算.
 		velocity.y += _config.gravity
 	
-	if _is_grabbing_ladder():
-		# 上下ではしご移動.
+	if _is_grabbing_ladder() or _is_climbing_wall():
+		# 上下ではしご移動 or 壁登り.
 		var v = Input.get_axis("ui_up", "ui_down")
 		if v != 0:
 			velocity.x = 0 # X方向を止める.
@@ -294,6 +294,10 @@ func _check_jump() -> bool:
 	if _is_grabbing_ladder():
 		# はしご掴まっていればジャンプできる.
 		return true
+		
+	if _is_climbing_wall():
+		# 壁登り中もジャンプできる.
+		return true
 	
 	if _jump_cnt == 0:
 		if is_on_floor() == false:
@@ -311,6 +315,11 @@ func _start_jump() -> void:
 	velocity.y = _config.jump_velocity * -1
 	Common.play_se("jump")
 	
+	if _is_climbing_wall():
+		# 壁ジャンプは壁と反対側に移動させないと吸着してしまう.
+		var dir = get_wall_normal().x
+		_update_horizontal_moving(false, dir, 10.0)
+	
 	# 空中状態にする.
 	_move_state = eMoveState.AIR
 	
@@ -327,7 +336,7 @@ func _check_fall_through() -> bool:
 	return false
 	
 ## 左右移動の更新.
-func _update_horizontal_moving(can_move:bool=true) -> void:
+func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, multipuly:float=1.0) -> void:
 	if can_move:
 		# 左右キーで移動.
 		if Input.is_action_pressed("ui_left"):
@@ -336,9 +345,13 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 			_direction = 1
 	else:
 		_direction = 0
+		
+	if force_direction != 0:
+		# 強制的に方向を指定.
+		_direction = force_direction
 
 	var dir = _direction
-	if _config.can_stop:
+	if _config.can_stop and can_move:
 		# デバッグ用に止まれる.
 		if Input.get_axis("ui_left", "ui_right") == 0:
 			dir = 0
@@ -356,6 +369,7 @@ func _update_horizontal_moving(can_move:bool=true) -> void:
 	var SCROLLPANEL_SPEED = _config.scroll_panel_speed
 	# 前回の速度を減衰させる.
 	var base = velocity.x * (1.0 - GROUND_ACC_RATIO)
+	base *= multipuly
 	
 	# 踏んでいるタイルごとの処理.
 	match _stomp_tile:
@@ -478,9 +492,18 @@ func _update_move_state() -> void:
 				velocity.y = 0
 			elif is_on_floor():
 				_move_state = eMoveState.LANDING
+		eMoveState.CLIMBING_WALL:
+			if is_on_wall() == false:
+				# 壁から離れた.
+				_move_state = eMoveState.AIR
 		eMoveState.AIR:
 			if is_on_floor():
 				_move_state = eMoveState.LANDING
+			elif is_on_wall():
+				# 壁に掴まる.
+				_move_state = eMoveState.CLIMBING_WALL
+				# 着地 (着地アニメなし)
+				_just_landing(false)
 		eMoveState.LANDING:
 			if is_on_floor() == false:
 				_move_state = eMoveState.AIR
@@ -494,19 +517,31 @@ func _update_move_state() -> void:
 				# 着地 (着地アニメなし)
 				_just_landing(false)
 	
-# 着地しているかどうか.
+## 着地しているかどうか.
 func _is_landing() -> bool:
 	return _move_state == eMoveState.LANDING
 	
-# 空中かどうか.
+## 空中かどうか.
 func _is_in_the_air() -> bool:
 	return _move_state == eMoveState.AIR
 
-# はしごを掴んでいるかどうか.
+## はしごを掴んでいるかどうか.
 func _is_grabbing_ladder() -> bool:
 	return _move_state == eMoveState.GRABBING_LADDER
 
-# デバッグ用更新.
+## 壁を掴んでいるかどうか.
+func _is_climbing_wall() -> bool:
+	return _move_state == eMoveState.CLIMBING_WALL
+
+## 重力の影響を受ける移動状態かどうか.
+func _is_add_gravity() -> bool:
+	match _move_state:
+		eMoveState.GRABBING_LADDER, eMoveState.CLIMBING_WALL:
+			return false
+		_:
+			return true
+
+## デバッグ用更新.
 func _update_debug() -> void:
 	_label.visible = true
 	_label.text = "move:%s"%(eMoveState.keys()[_move_state])
