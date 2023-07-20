@@ -189,7 +189,7 @@ func _update_dead(delta:float) -> void:
 	# 移動.
 	## 重力.
 	velocity.y = min(velocity.y + _config.gravity, _config.fall_speed_max)
-	_update_horizontal_moving(false)
+	_update_horizontal_moving(false, 1)
 	move_and_slide()
 	
 	_update_jump_scale_anim(delta)
@@ -250,6 +250,7 @@ func _update_moving() -> void:
 		# 常に重力を加算.
 		velocity.y += _config.gravity
 	
+	var can_move = true
 	if _is_grabbing_ladder() or _is_climbing_wall():
 		# 上下ではしご移動 or 壁登り.
 		var v = Input.get_axis("ui_up", "ui_down")
@@ -258,9 +259,14 @@ func _update_moving() -> void:
 			velocity.y = 300 * v
 		else:
 			velocity.y = 0
+		if _is_climbing_wall():
+			# 壁のぼり中は左右移動できない.
+			can_move = false
+		
 		if _check_jump():
 			# ジャンプ開始.
-			_start_jump()
+			var is_wall_jump = _is_climbing_wall()
+			_start_jump(is_wall_jump)
 			_move_state = eMoveState.AIR
 	elif _is_fall_through:
 		# 飛び降り中.
@@ -280,7 +286,7 @@ func _update_moving() -> void:
 		_start_jump()
 	
 	# 左右移動の更新.
-	_update_horizontal_moving()
+	_update_horizontal_moving(can_move)
 
 ## ジャンプチェック.
 func _check_jump() -> bool:
@@ -311,14 +317,17 @@ func _check_jump() -> bool:
 	return true
 
 ## ジャンプ開始.
-func _start_jump() -> void:
+func _start_jump(is_wall_jump:bool = false) -> void:
 	velocity.y = _config.jump_velocity * -1
 	Common.play_se("jump")
 	
-	if _is_climbing_wall():
+	if is_wall_jump:
 		# 壁ジャンプは壁と反対側に移動させないと吸着してしまう.
 		var dir = get_wall_normal().x
 		_update_horizontal_moving(false, dir, 10.0)
+		if Input.is_action_pressed("ui_down"):
+			# 下押しながらの場合はY方向への移動はしない.
+			velocity.y = 0
 	
 	# 空中状態にする.
 	_move_state = eMoveState.AIR
@@ -336,15 +345,13 @@ func _check_fall_through() -> bool:
 	return false
 	
 ## 左右移動の更新.
-func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, multipuly:float=1.0) -> void:
+func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, force_direction_multipuly:float=0.0) -> void:
 	if can_move:
-		# 左右キーで移動.
+		# 左右キーで移動できる.
 		if Input.is_action_pressed("ui_left"):
 			_direction = -1
 		elif Input.is_action_pressed("ui_right"):
 			_direction = 1
-	else:
-		_direction = 0
 		
 	if force_direction != 0:
 		# 強制的に方向を指定.
@@ -369,7 +376,7 @@ func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, multip
 	var SCROLLPANEL_SPEED = _config.scroll_panel_speed
 	# 前回の速度を減衰させる.
 	var base = velocity.x * (1.0 - GROUND_ACC_RATIO)
-	base *= multipuly
+	base += (dir * MOVE_SPEED * GROUND_ACC_RATIO * force_direction_multipuly)
 	
 	# 踏んでいるタイルごとの処理.
 	match _stomp_tile:
