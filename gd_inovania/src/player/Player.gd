@@ -14,7 +14,7 @@ const JUMP_SCALE_TIME := 0.2
 const JUMP_SCALE_VAL_JUMP := 0.2
 const JUMP_SCALE_VAL_LANDING := 0.25
 ## ダッシュタイマー.
-const DASH_TIME = 0.1
+const DASH_TIME = 0.15
 
 ## 状態.
 enum eState {
@@ -93,6 +93,8 @@ var _itemID:Map.eItem = Map.eItem.NONE
 var _ladder_count = 0
 ## ダッシュタイマー.
 var _timer_dash = 0.0
+## ダッシュ方向.
+var _dash_direction := Vector2.ZERO
 
 # ---------------------------------
 # public functions.
@@ -372,8 +374,17 @@ func _check_dash() -> bool:
 	
 ## ダッシュ開始.
 func _start_dash() -> void:
-	velocity.y = 0
+	# ダッシュ回数を増やす.
+	_dash_cnt += 1
+	# ダッシュ方向を設定.
+	_dash_direction.x = Input.get_axis("ui_left", "ui_right")
+	_dash_direction.y = Input.get_axis("ui_up", "ui_down")
+	_dash_direction = _dash_direction.normalized()
+	if _dash_direction.length() == 0:
+		# 入力がない場合は現在向いている方向にダッシュする.
+		_dash_direction = Vector2(_direction, 0)
 	_timer_dash = DASH_TIME
+	position.y -= 1 # 1px浮かす.
 	
 ## ダッシュ中かどうか.
 func _is_dash() -> bool:
@@ -410,9 +421,9 @@ func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, force_
 	
 	if _is_dash():
 		# ダッシュ中.
-		## ひとまず1.5倍.
-		var DASH_ACC_RATIO = _config.ground_acc_ratio * 50
-		velocity.x = _direction * MOVE_SPEED * DASH_ACC_RATIO
+		## ひとまず30倍.
+		var DASH_ACC_RATIO = _config.ground_acc_ratio * 30
+		velocity = _dash_direction * MOVE_SPEED * DASH_ACC_RATIO
 		return
 	
 	if _is_in_the_air():
@@ -454,11 +465,10 @@ func _update_direction() -> void:
 	_spr.flip_h = _is_right
 	_spr.frame = _get_anim()
 	
-	_shield.visible = true
-	if _is_right:
-		_shield.scale.x = 1
-	else:
-		_shield.scale.x = -1
+	_shield.visible = false
+	if _is_dash():
+		_shield.visible = true
+		_shield.rotation = _dash_direction.angle()
 
 ## アニメーションフレーム番号を取得する.
 func _get_anim() -> int:

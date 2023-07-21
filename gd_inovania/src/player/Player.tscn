@@ -34,15 +34,15 @@ offset_bottom = -62.0
 text = "DEBUG TEXT"
 
 [node name="Shield" type="Area2D" parent="."]
-visible = false
+position = Vector2(0, -32)
 collision_layer = 16
 collision_mask = 32
 script = ExtResource("3_4vfu0")
 
 [node name="Sprite" type="Sprite2D" parent="Shield"]
-position = Vector2(8, -28)
+position = Vector2(8, 0)
 texture = ExtResource("3_royls")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Shield"]
-position = Vector2(27, -28)
+position = Vector2(27, 0)
 shape = SubResource("RectangleShape2D_vw3cs")
