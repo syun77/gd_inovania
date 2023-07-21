@@ -42,6 +42,8 @@ enum eJumpScale {
 @onready var _config:Config = preload("res://assets/config.tres")
 ## Sprite.
 @onready var _spr = $Sprite
+## シールド.
+@onready var _shield = $Shield
 ## デバッグ用ラベル.
 @onready var _label = $Label
 
@@ -397,9 +399,19 @@ func _update_anim() -> void:
 		_spr.visible = false
 	
 	# 向きを更新.
+	_update_direction()
+
+## 向きを更新.
+func _update_direction() -> void:
 	_is_right = (_direction >= 0.0)
 	_spr.flip_h = _is_right
 	_spr.frame = _get_anim()
+	
+	_shield.visible = true
+	if _is_right:
+		_shield.scale.x = 1
+	else:
+		_shield.scale.x = -1
 
 ## アニメーションフレーム番号を取得する.
 func _get_anim() -> int:

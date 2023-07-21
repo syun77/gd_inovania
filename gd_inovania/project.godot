@@ -45,6 +45,8 @@ action={
 2d_physics/layer_2="Floor"
 2d_physics/layer_3="Ladder"
 2d_physics/layer_4="Wall2"
+2d_physics/layer_5="Shield"
+2d_physics/layer_6="Block"
 
 [rendering]
 
