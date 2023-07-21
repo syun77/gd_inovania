@@ -6,12 +6,15 @@ class_name Player
 # ---------------------------------
 # const.
 # ---------------------------------
-var ANIM_NORMAL_TBL = [0, 1]
-var ANIM_DEAD_TBL = [2, 3, 4, 5]
-
+## アニメーションテーブル.
+const ANIM_NORMAL_TBL = [0, 1]
+const ANIM_DEAD_TBL = [2, 3, 4, 5]
+## ジャンプの拡大・縮小演出.
 const JUMP_SCALE_TIME := 0.2
 const JUMP_SCALE_VAL_JUMP := 0.2
 const JUMP_SCALE_VAL_LANDING := 0.25
+## ダッシュタイマー.
+const DASH_TIME = 0.1
 
 ## 状態.
 enum eState {
@@ -81,10 +84,15 @@ var _jump_scale_timer = 0.0
 ## ジャンプ回数.
 var _jump_cnt = 0
 var _jump_cnt_max = 1
+## ダッシュ回数.
+var _dash_cnt = 0
+var _dash_cnt_max = 1
 ## 獲得したアイテム.
 var _itemID:Map.eItem = Map.eItem.NONE
 ## はしご接触数.
 var _ladder_count = 0
+## ダッシュタイマー.
+var _timer_dash = 0.0
 
 # ---------------------------------
 # public functions.
@@ -159,7 +167,7 @@ func _update_main(delta:float) -> void:
 	_update_recovery(delta)
 	
 	# 移動処理.
-	_update_moving()
+	_update_moving(delta)
 	
 	# アニメーション更新.
 	_update_anim()
@@ -206,6 +214,7 @@ func _just_landing(is_scale_anim:bool) -> void:
 		_jump_scale = eJumpScale.LANDING
 		_jump_scale_timer = JUMP_SCALE_TIME
 	_jump_cnt = 0 # ジャンプ回数をリセット.
+	_dash_cnt = 0 # ダッシュ回数をリセット.
 
 	
 ## HP回復処理.
@@ -232,7 +241,12 @@ func _set_fall_through(b:bool) -> void:
 	_update_collision_layer()
 
 ## 移動処理.
-func _update_moving() -> void:
+func _update_moving(delta:float) -> void:
+	# ダッシュタイマー更新.
+	if _timer_dash > 0.0:
+		_timer_dash -= delta
+	
+	# ダメージ処理.
 	if _is_damage:
 		_is_damage = false
 		if _timer_muteki <= 0:
@@ -270,6 +284,10 @@ func _update_moving() -> void:
 			var is_wall_jump = _is_climbing_wall()
 			_start_jump(is_wall_jump)
 			_move_state = eMoveState.AIR
+		elif _check_dash():
+			# ダッシュ開始.
+			_start_dash()
+			_move_state = eMoveState.AIR
 	elif _is_fall_through:
 		# 飛び降り中.
 		if _check_fall_through() == false:
@@ -286,6 +304,10 @@ func _update_moving() -> void:
 	elif _check_jump():
 		# ジャンプする.
 		_start_jump()
+		
+	elif _check_dash():
+		# ダッシュする.
+		_start_dash()
 	
 	# 左右移動の更新.
 	_update_horizontal_moving(can_move)
@@ -338,6 +360,24 @@ func _start_jump(is_wall_jump:bool = false) -> void:
 	_jump_scale = eJumpScale.JUMPING
 	_jump_scale_timer = JUMP_SCALE_TIME
 
+## ダッシュチェック.
+func _check_dash() -> bool:
+	if Input.is_action_just_pressed("special") == false:
+		return false # ダッシュボタンを押していない.
+	
+	if _dash_cnt >= _dash_cnt_max:
+		return false # ダッシュ回数が足りない.
+	
+	return true
+	
+## ダッシュ開始.
+func _start_dash() -> void:
+	velocity.y = 0
+	_timer_dash = DASH_TIME
+	
+## ダッシュ中かどうか.
+func _is_dash() -> bool:
+	return _timer_dash > 0.0
 	
 ## 飛び降り判定.
 func _check_fall_through() -> bool:
@@ -367,6 +407,13 @@ func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, force_
 
 	var MOVE_SPEED = _config.move_speed
 	var AIR_ACC_RATIO = _config.air_acc_ratio
+	
+	if _is_dash():
+		# ダッシュ中.
+		## ひとまず1.5倍.
+		var DASH_ACC_RATIO = _config.ground_acc_ratio * 50
+		velocity.x = _direction * MOVE_SPEED * DASH_ACC_RATIO
+		return
 	
 	if _is_in_the_air():
 		# 空中移動.
@@ -554,6 +601,9 @@ func _is_climbing_wall() -> bool:
 
 ## 重力の影響を受ける移動状態かどうか.
 func _is_add_gravity() -> bool:
+	if _is_dash():
+		return false # ダッシュ中は重力の影響を受けない.
+	
 	match _move_state:
 		eMoveState.GRABBING_LADDER, eMoveState.CLIMBING_WALL:
 			return false
