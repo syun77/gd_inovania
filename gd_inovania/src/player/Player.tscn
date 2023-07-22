@@ -12,14 +12,14 @@ size = Vector2(48, 56)
 size = Vector2(26, 72)
 
 [node name="Player" type="CharacterBody2D"]
-collision_mask = 10
-platform_floor_layers = 4294967266
-platform_wall_layers = 8
+collision_mask = 42
+platform_floor_layers = 4294967040
 script = ExtResource("1_ex6wv")
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_88ada")
 offset = Vector2(0, -32)
+flip_h = true
 hframes = 6
 vframes = 4
 
@@ -40,9 +40,9 @@ collision_mask = 32
 script = ExtResource("3_4vfu0")
 
 [node name="Sprite" type="Sprite2D" parent="Shield"]
-position = Vector2(8, 0)
+position = Vector2(16, 0)
 texture = ExtResource("3_royls")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Shield"]
-position = Vector2(27, 0)
+position = Vector2(35, 0)
 shape = SubResource("RectangleShape2D_vw3cs")

@@ -207,6 +207,7 @@ static func erase_cell(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) ->
 	_tilemap.erase_cell(tile_layer, pos)
 static func erase_cell_from_world(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
 	var grid_pos = world_to_grid(pos)
+	erase_cell(grid_pos, tile_layer)
 
 ## 床の種別を取得する.
 static func get_floor_type(world:Vector2) -> eType:

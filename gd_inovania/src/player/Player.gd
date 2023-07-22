@@ -69,8 +69,8 @@ var _is_right = true # 左向きで開始.
 var _is_fall_through = false
 ## 方向.
 var _direction = 0
-## 踏んでいる床.
-var _stomp_tile = Map.eType.NONE
+## 接触している壁.
+var _touch_tile = Map.eType.NONE
 ## ダメージ処理フラグ.
 var _is_damage = false
 ## ダメージ値.
@@ -151,6 +151,7 @@ func _ready() -> void:
 	hp = _config.hp_init
 	max_hp = hp
 	_spr.flip_h = _is_right
+	_direction = 1
 	
 	var frame = 0
 	_spr.frame = frame
@@ -439,8 +440,8 @@ func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, force_
 	base += (dir * MOVE_SPEED * GROUND_ACC_RATIO * force_direction_multipuly)
 	
 	# 踏んでいるタイルごとの処理.
-	match _stomp_tile:
-		Map.eType.NONE: # 普通の床.
+	match _touch_tile:
+		Map.eType.NONE, Map.eType.CLIMBBING_WALL: # 普通の床 or 登れる壁.
 			velocity.x = base + dir * MOVE_SPEED * GROUND_ACC_RATIO
 		Map.eType.SCROLL_L: # ベルト床(左).
 			velocity.x = base + (dir * MOVE_SPEED - SCROLLPANEL_SPEED) * GROUND_ACC_RATIO
@@ -496,8 +497,7 @@ func _update_collision_layer() -> void:
 func _update_collision_post() -> void:
 	# 衝突したコリジョンに対応するフラグを設定する.
 	var dist = 99999 # 一番近いオブジェクトだけ処理する.
-	_stomp_tile = Map.eType.NONE # 処理するタイル.
-	
+	_touch_tile = Map.eType.NONE # 処理するタイル.
 	for i in range(get_slide_collision_count()):
 		var col:KinematicCollision2D = get_slide_collision(i)
 		# 衝突位置.
@@ -509,15 +509,15 @@ func _update_collision_post() -> void:
 			_is_damage = true # ダメージ処理は最優先.
 			continue # 移動処理に直接の影響はない.
 		
-		if pos.y < position.y:
-			# プレイヤーよりも上にあるタイルは処理不要.
-			continue
+		#if pos.y < position.y:
+		#	# プレイヤーよりも上にあるタイルは処理不要.
+		#	continue
 			
-		var d = pos.x - position.x
+		var d = abs(pos.x - position.x)
 		if d < dist:
 			# より近い.
 			dist = d
-			_stomp_tile = v
+			_touch_tile = v
 
 ## 床種別に対応した処理をする.
 func _update_floor_type(delta:float, v:Map.eType) -> bool:
@@ -569,13 +569,13 @@ func _update_move_state() -> void:
 			elif is_on_floor():
 				_move_state = eMoveState.LANDING
 		eMoveState.CLIMBING_WALL:
-			if is_on_wall() == false:
+			if _is_on_wall() == false:
 				# 壁から離れた.
 				_move_state = eMoveState.AIR
 		eMoveState.AIR:
 			if is_on_floor():
 				_move_state = eMoveState.LANDING
-			elif is_on_wall():
+			elif _is_on_wall():
 				# 壁に掴まる.
 				_move_state = eMoveState.CLIMBING_WALL
 				# 着地 (着地アニメなし)
@@ -604,6 +604,15 @@ func _is_in_the_air() -> bool:
 ## はしごを掴んでいるかどうか.
 func _is_grabbing_ladder() -> bool:
 	return _move_state == eMoveState.GRABBING_LADDER
+	
+## 掴める壁に触れているかどうか.
+func _is_on_wall() -> bool:
+	if is_on_wall() == false:
+		return false # 壁に接触していない.
+	if _touch_tile != Map.eType.CLIMBBING_WALL:
+		return false # 掴まれる壁ではない.
+	
+	return true
 
 ## 壁を掴んでいるかどうか.
 func _is_climbing_wall() -> bool:

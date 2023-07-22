@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://b8uqypn4vnel"]
+
+[ext_resource type="Script" path="res://src/gimmic/Block.gd" id="1_412rp"]
+[ext_resource type="Texture2D" uid="uid://hy4on12o7soa" path="res://assets/images/block.png" id="1_x876v"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xab1p"]
+size = Vector2(60, 60)
+
+[node name="Block" type="StaticBody2D"]
+collision_layer = 32
+script = ExtResource("1_412rp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_x876v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2, -2)
+shape = SubResource("RectangleShape2D_xab1p")

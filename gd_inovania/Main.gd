@@ -10,6 +10,11 @@ const MAP_WIDTH = 20
 const MAP_HEIGHT = 15
 
 # -------------------------------------------
+# objects.
+# -------------------------------------------
+const BLOCK_OBJ = preload("res://src/gimmic/Block.tscn")
+
+# -------------------------------------------
 # onready.
 # -------------------------------------------
 @onready var _map = $BgLayer/TileMap
@@ -56,10 +61,16 @@ func _create_obj_from_tile() -> void:
 			if type == Map.eType.NONE:
 				continue
 			
+			#print(type, ":", pos)
+			
 			match type:
 				Map.eType.BLOCK:
+					var obj = BLOCK_OBJ.instantiate()
+					obj.position = pos
+					_bg_layer.add_child(obj)
 					Map.erase_cell_from_world(pos)
 				Map.eType.LADDER:
 					Map.erase_cell_from_world(pos)
 				Map.eType.CLIMBBING_WALL:
-					Map.erase_cell_from_world(pos)
+					#Map.erase_cell_from_world(pos)
+					pass
