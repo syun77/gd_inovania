@@ -37,9 +37,29 @@ func _ready() -> void:
 	# マップのセットアップ.
 	Map.setup(_map, MAP_WIDTH, MAP_HEIGHT)
 	
+	# タイルマップからオブジェクトを作る.
+	_create_obj_from_tile()
+	
 	# プレイヤー移動開始.
 	_player.start()
 
 ## 更新.
 func _physics_process(delta: float) -> void:
 	_player.update(delta)	
+
+## タイルからオブジェクトを作る.
+func _create_obj_from_tile() -> void:
+	for j in range(MAP_HEIGHT):
+		for i in range(MAP_WIDTH):
+			var pos = Map.grid_to_world(Vector2(i, j))
+			var type = Map.get_floor_type(pos)
+			if type == Map.eType.NONE:
+				continue
+			
+			match type:
+				Map.eType.BLOCK:
+					Map.erase_cell_from_world(pos)
+				Map.eType.LADDER:
+					Map.erase_cell_from_world(pos)
+				Map.eType.CLIMBBING_WALL:
+					Map.erase_cell_from_world(pos)

@@ -25,6 +25,10 @@ enum eType {
 	SPIKE = 3, # トゲ.
 	SLIP = 4, # 滑る床.
 	LOCK = 5, # 鍵穴.
+	BLOCK = 6, # ブロック.
+	LADDER = 7, # はしご.
+	CLIMBBING_WALL = 8, # 登れる壁.
+	
 }
 
 ## アイテムID.
@@ -149,7 +153,7 @@ static func get_tile_size() -> int:
 	return _tilemap.tile_set.tile_size.x
 
 ## ワールド座標をグリッド座標に変換する.
-static func world_to_grid(world:Vector2, centered=true) -> Vector2:
+static func world_to_grid(world:Vector2, centered:bool=true) -> Vector2:
 	var grid = Vector2()
 	grid.x = world_to_grid_x(world.x, centered)
 	grid.y = world_to_grid_y(world.y, centered)
@@ -166,18 +170,18 @@ static func world_to_grid_y(wy:float, centered:bool) -> float:
 	return (wy-OFS_Y) / size
 
 ## グリッド座標をワールド座標に変換する.
-static func grid_to_world(grid:Vector2, centered:bool) -> Vector2:
+static func grid_to_world(grid:Vector2, centered:bool=true) -> Vector2:
 	var world = Vector2()
 	world.x = grid_to_world_x(grid.x, centered)
 	world.y = grid_to_world_y(grid.y, centered)
 	return world
-static func grid_to_world_x(gx:float, centered:bool) -> float:
+static func grid_to_world_x(gx:float, centered:bool=true) -> float:
 	var size = get_tile_size()
 	var x = OFS_X + (gx * size)
 	if centered:
 		x += size / 2.0 # 中央に移動.
 	return x
-static func grid_to_world_y(gy:float, centered:bool) -> float:
+static func grid_to_world_y(gy:float, centered:bool=true) -> float:
 	var size = get_tile_size()
 	var y = OFS_Y + (gy * size)
 	if centered:
@@ -199,8 +203,10 @@ static func get_mouse_pos(viewport:Viewport, is_snap:bool=false) -> Vector2:
 	return grid_to_world(pos, true)
 	
 ## 指定の位置にあるタイル消す.
-static func erase_cell(pos:Vector2i, tile_layer:eTileLayer) -> void:
+static func erase_cell(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
 	_tilemap.erase_cell(tile_layer, pos)
+static func erase_cell_from_world(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
+	var grid_pos = world_to_grid(pos)
 
 ## 床の種別を取得する.
 static func get_floor_type(world:Vector2) -> eType:

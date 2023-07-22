@@ -23,6 +23,7 @@ Ease="*res://src/common/Ease.gd"
 [display]
 
 window/stretch/mode="viewport"
+window/dpi/allow_hidpi=false
 
 [editor]
 

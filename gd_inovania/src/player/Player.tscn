@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://ch0yf5nkshbib"]
 
 [ext_resource type="Script" path="res://src/player/Player.gd" id="1_ex6wv"]
-[ext_resource type="Texture2D" uid="uid://chheu7t0waflt" path="res://assets/images/player.png" id="2_88ada"]
+[ext_resource type="Texture2D" uid="uid://det6e6ha48hp8" path="res://assets/images/player.png" id="2_88ada"]
 [ext_resource type="Script" path="res://src/player/Shield.gd" id="3_4vfu0"]
-[ext_resource type="Texture2D" uid="uid://demnefxhl0wql" path="res://assets/images/shield.png" id="3_royls"]
+[ext_resource type="Texture2D" uid="uid://p6q4fe3hlsij" path="res://assets/images/shield.png" id="3_royls"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_83kri"]
 size = Vector2(48, 56)
@@ -13,7 +13,7 @@ size = Vector2(26, 72)
 
 [node name="Player" type="CharacterBody2D"]
 collision_mask = 10
-platform_floor_layers = 4294967283
+platform_floor_layers = 4294967266
 platform_wall_layers = 8
 script = ExtResource("1_ex6wv")
 
