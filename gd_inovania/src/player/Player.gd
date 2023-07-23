@@ -352,7 +352,7 @@ func _check_jump() -> bool:
 ## ジャンプ開始.
 func _start_jump(is_wall_jump:bool = false) -> void:
 	velocity.y = _config.jump_velocity * -1
-	Common.play_se("jump")
+	Common.play_se("jump", 3)
 	
 	if is_wall_jump:
 		# 壁ジャンプは壁と反対側に移動させないと吸着してしまう.
@@ -381,6 +381,8 @@ func _check_dash() -> bool:
 	
 ## ダッシュ開始.
 func _start_dash() -> void:
+	Common.play_se("dash", 3)
+
 	# ダッシュ回数を増やす.
 	_dash_cnt += 1
 	# ダッシュ方向を設定.
@@ -602,6 +604,7 @@ func _update_move_state() -> void:
 				_move_state = eMoveState.LANDING
 			elif _is_on_wall():
 				# 壁に掴まる.
+				Common.play_se("climb")
 				_move_state = eMoveState.CLIMBING_WALL
 				# 着地 (着地アニメなし)
 				_just_landing(false)
@@ -667,8 +670,9 @@ var hp:int = 0:
 		return hp
 	set(v):
 		hp = v
-		if hp < 0:
-			hp = 0
+		if hp < 1:
+			# 無敵モード.
+			hp = 1
 ## 最大HP
 var max_hp:int = 0:
 	get:

@@ -9,6 +9,7 @@ class_name Block
 # --------------------------------------
 ## ブロック破壊演出
 func vanish(deg:float) -> void:
+	Common.play_se("broken")
 	var type = ParticleUtil.eType.BLOCK
 	for i in range(8):
 		var deg2 = deg + randf_range(-60, 60)

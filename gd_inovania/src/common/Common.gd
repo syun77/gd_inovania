@@ -55,6 +55,9 @@ var _snd_tbl = {
 	"itemget2": "res://assets/sound/itemget2.wav",
 	"itemget": "res://assets/sound/itemget.wav",
 	"jump": "res://assets/sound/jump.wav",
+	"dash": "res://assets/sound/dash.wav",
+	"broken": "res://assets/sound/broken.wav",
+	"climb": "res://assets/sound/climb.wav",
 }
 
 var _slow_timer = 0.0 # スロータイマー.
