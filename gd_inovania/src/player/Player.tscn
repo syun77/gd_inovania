@@ -1,15 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://ch0yf5nkshbib"]
+[gd_scene load_steps=4 format=3 uid="uid://ch0yf5nkshbib"]
 
 [ext_resource type="Script" path="res://src/player/Player.gd" id="1_ex6wv"]
 [ext_resource type="Texture2D" uid="uid://det6e6ha48hp8" path="res://assets/images/player.png" id="2_88ada"]
-[ext_resource type="Script" path="res://src/player/Shield.gd" id="3_4vfu0"]
-[ext_resource type="Texture2D" uid="uid://p6q4fe3hlsij" path="res://assets/images/shield.png" id="3_royls"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_83kri"]
 size = Vector2(48, 56)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_vw3cs"]
-size = Vector2(26, 72)
 
 [node name="Player" type="CharacterBody2D"]
 collision_mask = 42
@@ -32,19 +27,3 @@ offset_left = -96.0
 offset_top = -88.0
 offset_bottom = -62.0
 text = "DEBUG TEXT"
-
-[node name="Shield" type="Area2D" parent="."]
-position = Vector2(0, -32)
-collision_layer = 16
-collision_mask = 32
-script = ExtResource("3_4vfu0")
-
-[node name="Sprite" type="Sprite2D" parent="Shield"]
-position = Vector2(16, 0)
-texture = ExtResource("3_royls")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Shield"]
-position = Vector2(35, 0)
-shape = SubResource("RectangleShape2D_vw3cs")
-
-[connection signal="body_entered" from="Shield" to="Shield" method="_on_body_entered"]

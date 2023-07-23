@@ -4,6 +4,11 @@ extends CharacterBody2D
 # =================================
 class_name Player
 # ---------------------------------
+# object.
+# ---------------------------------
+const SHIELD_OBJ = preload("res://src/player/Shield.tscn")
+
+# ---------------------------------
 # const.
 # ---------------------------------
 ## アニメーションテーブル.
@@ -15,8 +20,6 @@ const JUMP_SCALE_VAL_JUMP := 0.2
 const JUMP_SCALE_VAL_LANDING := 0.25
 ## ダッシュタイマー.
 const DASH_TIME = 0.15
-## シールドタイマー.
-const SHIELD_TIME = 0.3
 
 ## 状態.
 enum eState {
@@ -47,8 +50,6 @@ enum eJumpScale {
 @onready var _config:Config = preload("res://assets/config.tres")
 ## Sprite.
 @onready var _spr = $Sprite
-## シールド.
-@onready var _shield = $Shield
 ## デバッグ用ラベル.
 @onready var _label = $Label
 
@@ -97,8 +98,8 @@ var _ladder_count = 0
 var _timer_dash = 0.0
 ## ダッシュ方向.
 var _dash_direction := Vector2.ZERO
-## シールドタイマー.
-var _timer_shield = 0.0
+## シールド.
+var _shield:Shield = null
 
 # ---------------------------------
 # public functions.
@@ -252,9 +253,9 @@ func _update_moving(delta:float) -> void:
 	# ダッシュタイマー更新.
 	if _timer_dash > 0.0:
 		_timer_dash -= delta
-	# シールドタイマーの更新.
-	if _timer_shield > 0.0:
-		_timer_shield -= delta
+	if _is_shield():
+		# シールド更新.
+		_shield.update(delta)
 	
 	# ダメージ処理.
 	if _is_damage:
@@ -393,11 +394,13 @@ func _start_dash() -> void:
 	
 	# タイマー設定.
 	_timer_dash = DASH_TIME
-	_timer_shield = SHIELD_TIME
 	
 	position.y -= 1 # 1px浮かす.
 	_move_state = eMoveState.AIR
 
+	# シールドを生成.
+	_shield = SHIELD_OBJ.instantiate()
+	add_child(_shield)
 	# シールドの向きをダッシュ方向にする.
 	_shield.rotation = _dash_direction.angle()
 	
@@ -407,7 +410,7 @@ func _is_dash() -> bool:
 
 ## シールド表示中かどうか.
 func _is_shield() -> bool:
-	return _timer_shield > 0.0
+	return is_instance_valid(_shield)
 	
 ## 飛び降り判定.
 func _check_fall_through() -> bool:
@@ -483,10 +486,6 @@ func _update_direction() -> void:
 	_is_right = (_direction >= 0.0)
 	_spr.flip_h = _is_right
 	_spr.frame = _get_anim()
-	
-	_shield.visible = false
-	if _is_shield():
-		_shield.visible = true
 
 ## アニメーションフレーム番号を取得する.
 func _get_anim() -> int:
