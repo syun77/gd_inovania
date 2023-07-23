@@ -8,6 +8,7 @@ class_name ParticleUtil
 # ----------------------------------
 const PARTICLE_OBJ = preload("res://src/particle/Particle.tscn")
 const PARTICLE_BLOCK_OBJ = preload("res://src/particle/ParticleBlock.tscn")
+const PARTICLE_INO_BLUE_OBJ = preload("res://src/particle/ParticleInoBlur.tscn")
 
 # ----------------------------------
 # consts.
@@ -15,10 +16,12 @@ const PARTICLE_BLOCK_OBJ = preload("res://src/particle/ParticleBlock.tscn")
 enum eType {
 	SIMPLE,
 	BLOCK,
+	INO_BLUR,
 }
 const TBL = {
 	eType.SIMPLE: PARTICLE_OBJ,
 	eType.BLOCK: PARTICLE_BLOCK_OBJ,
+	eType.INO_BLUR: PARTICLE_INO_BLUE_OBJ,
 }
 
 # ----------------------------------

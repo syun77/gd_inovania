@@ -10,6 +10,8 @@ class_name Map
 const OFS_X = 0
 const OFS_Y = 0
 
+const TILE_SOURCE_ID = 0
+
 ## タイルマップのレイヤー.
 enum eTileLayer {
 	GROUND, # 地面.
@@ -205,9 +207,15 @@ static func get_mouse_pos(viewport:Viewport, is_snap:bool=false) -> Vector2:
 ## 指定の位置にあるタイル消す.
 static func erase_cell(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
 	_tilemap.erase_cell(tile_layer, pos)
-static func erase_cell_from_world(pos:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
+static func erase_cell_from_world(pos:Vector2, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
 	var grid_pos = world_to_grid(pos)
 	erase_cell(grid_pos, tile_layer)
+## 指定の位置にあるタイルを置き換える.
+static func replace_cell(pos:Vector2i, atlas_coords:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
+	_tilemap.set_cell(tile_layer, pos, TILE_SOURCE_ID, atlas_coords)
+static func replace_cell_from_world(pos:Vector2, atlas_coords:Vector2i, tile_layer:eTileLayer=eTileLayer.GROUND) -> void:
+	var grid_pos = world_to_grid(pos)
+	replace_cell(grid_pos, atlas_coords, tile_layer)
 
 ## 床の種別を取得する.
 static func get_floor_type(world:Vector2) -> eType:

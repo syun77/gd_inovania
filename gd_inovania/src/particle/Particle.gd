@@ -10,6 +10,7 @@ class_name Particle
 # --------------------------------------------
 var color = Color.WHITE
 var gravity = 9.8 * 2
+var rotate_speed = 10.0
 
 var _cnt = 0 # move呼び出し回数.
 var _anim_cnt = 0 # アニメーション用カウンタ.
@@ -19,11 +20,11 @@ var _decay = 0.97 # 減衰率.
 var _life = 1.0 # 生存時間.
 var _timer = 0.0 # 経過時間.
 var _is_auto_destroy = true
-var _rotate_speed = 10.0
 
 # --------------------------------------------
 # public functions.
 # --------------------------------------------
+
 ## セットアップ.
 func setup(deg:float, speed:float, life:float, sc:float=1.0, decay:float=0.97):
 	_deg = deg
@@ -67,7 +68,7 @@ func move(delta:float) -> void:
 	_timer += delta
 	
 	# 回転する.
-	rotation_degrees += _rotate_speed
+	rotation_degrees += rotate_speed
 	
 	if _is_auto_destroy and is_end():
 		# 自動で消滅.
@@ -87,9 +88,14 @@ func is_end() -> bool:
 # --------------------------------------------
 # private functions.
 # --------------------------------------------
+## 初期化 (オーバーライド用).
+func _start() -> void:
+	pass
+	
 ## 開始.
 func _ready() -> void:
 	_anim_cnt = randi()
+	_start()
 
 ## 更新.
 func _physics_process(delta: float) -> void:
@@ -98,6 +104,7 @@ func _physics_process(delta: float) -> void:
 	_update(delta)
 	
 	if is_end():
+		# 終了したので消去する.
 		queue_free()
 
 ## 更新(オーバーライド用)

@@ -484,6 +484,11 @@ func _update_anim() -> void:
 	
 	# 向きを更新.
 	_update_direction()
+	
+	# ダッシュ演出.
+	if _is_shield() and _cnt%3 == 0:
+		var p = ParticleUtil.add(position, ParticleUtil.eType.INO_BLUR, 0, 0, 0.3, 1.0)
+		p.flip_h = _spr.flip_h
 
 ## 向きを更新.
 func _update_direction() -> void:

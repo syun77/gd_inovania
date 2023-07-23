@@ -54,6 +54,7 @@ func _ready() -> void:
 	
 	# プレイヤー移動開始.
 	_player.start()
+	#_player.position.x += 4000
 
 ## 更新.
 func _physics_process(delta: float) -> void:
@@ -119,9 +120,8 @@ func _check_put_oneway(i:int, j:int) -> void:
 	if type == Map.eType.LADDER:
 		return # 上がハシゴなので何もしない.
 	
-	var obj2 = ONEWAY_FLOOR_OBJ.instantiate()
-	obj2.position = pos # 重ねるのはハシゴの上.
-	_bg_layer.add_child(obj2)
+	# 重ねるのはハシゴの上 (一方通行床で置き換える).
+	Map.replace_cell_from_world(pos, Vector2i(4, 0))
 
 
 # カメラの更新.
