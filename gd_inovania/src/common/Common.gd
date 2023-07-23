@@ -124,8 +124,8 @@ func update(delta:float) -> void:
 		_shake_timer -= delta
 
 ## CanvasLayerを取得する.
-func get_layer(name:String) -> CanvasLayer:
-	return _layers[name]
+func get_layer(layer_name:String) -> CanvasLayer:
+	return _layers[layer_name]
 	
 ## スロー再生係数.
 func get_slow_rate() -> float:

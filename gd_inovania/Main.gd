@@ -6,7 +6,7 @@ extends Node2D
 # -------------------------------------------
 # const.
 # -------------------------------------------
-const MAP_WIDTH = 80
+const MAP_WIDTH = 120
 const MAP_HEIGHT = 30
 
 # -------------------------------------------
@@ -106,6 +106,9 @@ func _create_obj_from_tile() -> void:
 
 ## 上を調べてコリジョンがなければ一方通行床を置く.
 func _check_put_oneway(i:int, j:int) -> void:
+	if i == 39 and j == 11:
+		return # ※[DEBUG]特定のタイルを強制的に除外.
+	
 	var pos = Map.grid_to_world(Vector2i(i, j))
 	var pos2 = Map.grid_to_world(Vector2(i, j-1))
 	var col_cnt = Map.get_tile_collision_polygons_count(Vector2(i, j-1), Map.eTileLayer.GROUND)
@@ -138,7 +141,7 @@ func _update_camera(delta:float, is_warp:bool=false) -> void:
 	# 揺れ更新.
 	_update_camera_shake(delta)
 
-func _update_camera_shake(delta:float) -> void:
+func _update_camera_shake(_delta:float) -> void:
 	var rate = Common.get_camera_shake_rate()
 	if rate <= 0.0:
 		_camera.offset = Vector2.ZERO
