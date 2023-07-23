@@ -19,7 +19,8 @@ const JUMP_SCALE_TIME := 0.2
 const JUMP_SCALE_VAL_JUMP := 0.2
 const JUMP_SCALE_VAL_LANDING := 0.25
 ## ダッシュタイマー.
-const DASH_TIME = 0.15
+const DASH_TIME = 0.05
+const DASH_SPEED_RATIO = 50.0 # ダッシュ速度倍率.
 
 ## 状態.
 enum eState {
@@ -399,6 +400,9 @@ func _start_dash() -> void:
 	_move_state = eMoveState.AIR
 
 	# シールドを生成.
+	if is_instance_valid(_shield):
+		# 生成済みの場合は破棄する.
+		_shield.queue_free()
 	_shield = SHIELD_OBJ.instantiate()
 	add_child(_shield)
 	# シールドの向きをダッシュ方向にする.
@@ -443,8 +447,7 @@ func _update_horizontal_moving(can_move:bool=true, force_direction:int=0, force_
 	
 	if _is_dash():
 		# ダッシュ中.
-		## ひとまず30倍.
-		var DASH_ACC_RATIO = _config.ground_acc_ratio * 30
+		var DASH_ACC_RATIO = _config.ground_acc_ratio * DASH_SPEED_RATIO
 		velocity = _dash_direction * MOVE_SPEED * DASH_ACC_RATIO
 		return
 	

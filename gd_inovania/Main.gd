@@ -29,6 +29,7 @@ const BLOCK_OBJ = preload("res://src/gimmic/Block.tscn")
 # -------------------------------------------
 # var.
 # -------------------------------------------
+var _cnt:int = 0
 
 # -------------------------------------------
 # private functions.
@@ -54,7 +55,16 @@ func _ready() -> void:
 
 ## 更新.
 func _physics_process(delta: float) -> void:
-	_player.update(delta)
+	_cnt += 1
+	# 共通の更新.
+	Common.update(delta)
+	
+	if Common.is_hit_stop() == false:
+		# プレイヤーの更新.
+		_player.update(delta)
+	
+	# カメラの更新.
+	_update_camera(delta)
 	
 	# デバッグ用更新.
 	_update_debug()
@@ -81,6 +91,22 @@ func _create_obj_from_tile() -> void:
 				Map.eType.CLIMBBING_WALL:
 					#Map.erase_cell_from_world(pos)
 					pass
+
+# カメラの更新.
+func _update_camera(delta:float) -> void:
+	_update_camera_shake(delta)
+
+func _update_camera_shake(delta:float) -> void:
+	var rate = Common.get_camera_shake_rate()
+	if rate <= 0.0:
+		_camera.offset = Vector2.ZERO
+	var dx = 1
+	if _cnt%4 < 2:
+		dx = -1
+	
+	var intensity = Common.get_camera_shake_intensity()
+	_camera.offset.x = 32.0 * dx * rate * intensity
+	_camera.offset.y = 24.0 * randf_range(-rate, rate) * intensity
 
 ## デバッグ用更新.
 func _update_debug() -> void:

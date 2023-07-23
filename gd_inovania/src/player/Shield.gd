@@ -41,6 +41,13 @@ func _on_body_entered(body: Node2D) -> void:
 		return # 念のため.
 	
 	var block = body as Block
-	block.vanish()
+	var deg = 360 - rotation_degrees + 180
+	block.vanish(deg)
 	block.queue_free()
+	
+	# ヒットストップ開始.
+	Common.start_hit_stop()
+	
+	# 少し画面を揺らす.
+	Common.start_camera_shake(0.1, 0.5)
 	

@@ -53,6 +53,13 @@ var _snd_tbl = {
 	"jump": "res://assets/sound/jump.wav",
 }
 
+var _slow_timer = 0.0 # スロータイマー.
+var _hit_stop_timer = 0.0 # ヒットストップタイマー.
+
+## 画面揺れ.
+var _shake_timer = 0.0 # 揺れタイマー.
+var _shake_max_timer = 1.0 # 揺れタイマーの最大.
+var _shake_intensity = 0.0 # 揺れ倍率.
 
 # ----------------------------------------
 # public functions.
@@ -84,6 +91,10 @@ func init_vars() -> void:
 	_gained_item = {}
 	_snds.clear()
 
+	# タイマーの初期化.
+	_slow_timer = 0.0
+	_hit_stop_timer = 0.0
+
 ## セットアップ.
 func setup(layers, player:Player, camera:Camera2D) -> void:
 	init_vars()
@@ -98,6 +109,47 @@ func setup(layers, player:Player, camera:Camera2D) -> void:
 		#snd.volume_db = -4
 		add_child(snd)
 		_snds.append(snd)
+
+## 更新.
+func update(delta:float) -> void:
+	if _slow_timer > 0.0:
+		_slow_timer -= delta
+	if _hit_stop_timer > 0.0:
+		_hit_stop_timer -= delta
+	if _shake_timer > 0.0:
+		_shake_timer -= delta
+
+## CanvasLayerを取得する.
+func get_layer(name:String) -> CanvasLayer:
+	return _layers[name]
+	
+## スロー再生係数.
+func get_slow_rate() -> float:
+	return 1.0
+	
+## ヒットストップ開始.
+func start_hit_stop(frame:int=3) -> void:
+	_hit_stop_timer = 0.01666 * frame # 60fpsと想定.
+
+## ヒットストップ中かどうか.
+func is_hit_stop() -> bool:
+	return _hit_stop_timer > 0.0
+	
+## 揺れ開始.
+func start_camera_shake(intensity:float=1.0, time:float=1.0) -> void:
+	_shake_intensity = intensity
+	_shake_timer = time
+	if time > 0.0:
+		_shake_max_timer = time
+
+## 揺れの値を取得する.
+func get_camera_shake_rate() -> float:
+	if _shake_timer <= 0.0:
+		return 0.0
+	
+	return _shake_timer / _shake_max_timer
+func get_camera_shake_intensity() -> float:
+	return _shake_intensity
 
 ## 経過時間を足し込む.
 func add_past_time(delta:float) -> void:
