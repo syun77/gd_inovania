@@ -46,3 +46,5 @@ texture = ExtResource("3_royls")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Shield"]
 position = Vector2(35, 0)
 shape = SubResource("RectangleShape2D_vw3cs")
+
+[connection signal="body_entered" from="Shield" to="Shield" method="_on_body_entered"]

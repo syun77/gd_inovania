@@ -23,6 +23,8 @@ const BLOCK_OBJ = preload("res://src/gimmic/Block.tscn")
 
 @onready var _bg_layer = $BgLayer
 @onready var _main_layer = $MainLayer
+@onready var _particle_layer = $ParticleLayer
+@onready var _ui_layer = $UILayer
 
 # -------------------------------------------
 # var.
@@ -36,6 +38,8 @@ func _ready() -> void:
 	var layers = {
 		"bg": _bg_layer,
 		"main": _main_layer,
+		"particle": _particle_layer,
+		"ui": _ui_layer,
 	}
 	Common.setup(layers, _player, _camera)
 	
@@ -50,7 +54,10 @@ func _ready() -> void:
 
 ## 更新.
 func _physics_process(delta: float) -> void:
-	_player.update(delta)	
+	_player.update(delta)
+	
+	# デバッグ用更新.
+	_update_debug()
 
 ## タイルからオブジェクトを作る.
 func _create_obj_from_tile() -> void:
@@ -74,3 +81,9 @@ func _create_obj_from_tile() -> void:
 				Map.eType.CLIMBBING_WALL:
 					#Map.erase_cell_from_world(pos)
 					pass
+
+## デバッグ用更新.
+func _update_debug() -> void:
+	if Input.is_action_just_pressed("reset"):
+		# リセット.
+		get_tree().change_scene_to_file("res://Main.tscn")

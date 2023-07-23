@@ -15,6 +15,8 @@ const JUMP_SCALE_VAL_JUMP := 0.2
 const JUMP_SCALE_VAL_LANDING := 0.25
 ## ダッシュタイマー.
 const DASH_TIME = 0.15
+## シールドタイマー.
+const SHIELD_TIME = 0.3
 
 ## 状態.
 enum eState {
@@ -95,6 +97,8 @@ var _ladder_count = 0
 var _timer_dash = 0.0
 ## ダッシュ方向.
 var _dash_direction := Vector2.ZERO
+## シールドタイマー.
+var _timer_shield = 0.0
 
 # ---------------------------------
 # public functions.
@@ -248,6 +252,9 @@ func _update_moving(delta:float) -> void:
 	# ダッシュタイマー更新.
 	if _timer_dash > 0.0:
 		_timer_dash -= delta
+	# シールドタイマーの更新.
+	if _timer_shield > 0.0:
+		_timer_shield -= delta
 	
 	# ダメージ処理.
 	if _is_damage:
@@ -290,7 +297,6 @@ func _update_moving(delta:float) -> void:
 		elif _check_dash():
 			# ダッシュ開始.
 			_start_dash()
-			_move_state = eMoveState.AIR
 	elif _is_fall_through:
 		# 飛び降り中.
 		if _check_fall_through() == false:
@@ -384,12 +390,24 @@ func _start_dash() -> void:
 	if _dash_direction.length() == 0:
 		# 入力がない場合は現在向いている方向にダッシュする.
 		_dash_direction = Vector2(_direction, 0)
+	
+	# タイマー設定.
 	_timer_dash = DASH_TIME
+	_timer_shield = SHIELD_TIME
+	
 	position.y -= 1 # 1px浮かす.
+	_move_state = eMoveState.AIR
+
+	# シールドの向きをダッシュ方向にする.
+	_shield.rotation = _dash_direction.angle()
 	
 ## ダッシュ中かどうか.
 func _is_dash() -> bool:
 	return _timer_dash > 0.0
+
+## シールド表示中かどうか.
+func _is_shield() -> bool:
+	return _timer_shield > 0.0
 	
 ## 飛び降り判定.
 func _check_fall_through() -> bool:
@@ -467,9 +485,8 @@ func _update_direction() -> void:
 	_spr.frame = _get_anim()
 	
 	_shield.visible = false
-	if _is_dash():
+	if _is_shield():
 		_shield.visible = true
-		_shield.rotation = _dash_direction.angle()
 
 ## アニメーションフレーム番号を取得する.
 func _get_anim() -> int:
