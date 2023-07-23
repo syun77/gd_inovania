@@ -17,7 +17,11 @@ const MAX_SOUND = 8
 enum eCollisionLayer {
 	PLAYER = 1, # プレイヤー.
 	WALL = 2, # 壁・床.
-	ONEWAY = 3, # 一方通行床.
+	LADDER = 3, # ハシゴ.
+	WALL2 = 4, # 登れる壁.
+	SHIELD = 5, # シールド.
+	BLOCK = 6, # 壊せる壁.
+	ONEWAY = 7, # 一方通行床.
 }
 
 # ----------------------------------------

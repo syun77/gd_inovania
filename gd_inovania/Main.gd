@@ -6,13 +6,15 @@ extends Node2D
 # -------------------------------------------
 # const.
 # -------------------------------------------
-const MAP_WIDTH = 20
-const MAP_HEIGHT = 15
+const MAP_WIDTH = 80
+const MAP_HEIGHT = 30
 
 # -------------------------------------------
 # objects.
 # -------------------------------------------
 const BLOCK_OBJ = preload("res://src/gimmic/Block.tscn")
+const LADDER_OBJ = preload("res://src/gimmic/Ladder.tscn")
+const ONEWAY_FLOOR_OBJ = preload("res://src/gimmic/OnewayFloor.tscn")
 
 # -------------------------------------------
 # onready.
@@ -72,6 +74,7 @@ func _physics_process(delta: float) -> void:
 ## タイルからオブジェクトを作る.
 func _create_obj_from_tile() -> void:
 	for j in range(MAP_HEIGHT):
+		j = MAP_HEIGHT - (j + 1)
 		for i in range(MAP_WIDTH):
 			var pos = Map.grid_to_world(Vector2(i, j))
 			var type = Map.get_floor_type(pos)
@@ -82,18 +85,57 @@ func _create_obj_from_tile() -> void:
 			
 			match type:
 				Map.eType.BLOCK:
+					# 壊せる壁.
 					var obj = BLOCK_OBJ.instantiate()
 					obj.position = pos
 					_bg_layer.add_child(obj)
 					Map.erase_cell_from_world(pos)
 				Map.eType.LADDER:
+					# ハシゴ.
+					var obj = LADDER_OBJ.instantiate()
+					obj.position = pos
+					_bg_layer.add_child(obj)
 					Map.erase_cell_from_world(pos)
+					
+					# 上を調べてコリジョンがなければ一方通行床を置く.
+					_check_put_oneway(i, j)
+
 				Map.eType.CLIMBBING_WALL:
 					#Map.erase_cell_from_world(pos)
 					pass
 
+## 上を調べてコリジョンがなければ一方通行床を置く.
+func _check_put_oneway(i:int, j:int) -> void:
+	var pos = Map.grid_to_world(Vector2i(i, j))
+	var pos2 = Map.grid_to_world(Vector2(i, j-1))
+	var col_cnt = Map.get_tile_collision_polygons_count(Vector2(i, j-1), Map.eTileLayer.GROUND)
+	if col_cnt > 0:
+		return # コリジョンがあるので何もしない.
+	
+	var type = Map.get_floor_type(pos2)
+	if type == Map.eType.LADDER:
+		return # 上がハシゴなので何もしない.
+	
+	var obj2 = ONEWAY_FLOOR_OBJ.instantiate()
+	obj2.position = pos # 重ねるのはハシゴの上.
+	_bg_layer.add_child(obj2)
+
+
 # カメラの更新.
-func _update_camera(delta:float) -> void:
+func _update_camera(delta:float, is_warp:bool=false) -> void:
+	# カメラの注視点
+	var target = _player.position
+	target.y += -64 # 1タイルずらす
+	target.x += _player.velocity.x * 0.7 # 移動先を見る.
+	
+	if is_warp:
+		# カメラワープが有効.
+		_camera.position = target
+	else:
+		# 通常はスムージングを行う.
+		_camera.position += (target - _camera.position) * 0.05	
+	
+	# 揺れ更新.
 	_update_camera_shake(delta)
 
 func _update_camera_shake(delta:float) -> void:

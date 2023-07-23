@@ -238,6 +238,13 @@ static func get_custom_data(pos:Vector2i, key:String) -> Variant:
 	
 	# 存在しない.
 	return null
+	
+## コリジョンレイヤーが設定されている数を取得する.
+static func get_tile_collision_polygons_count(pos:Vector2i, layer:eTileLayer) -> int:
+	var data = _tilemap.get_cell_tile_data(layer, pos)
+	if data == null:
+		return 0
+	return data.get_collision_polygons_count(layer)
 
 # --------------------------------------------------
 # private functions.

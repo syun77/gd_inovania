@@ -59,6 +59,7 @@ reset={
 2d_physics/layer_4="Wall2"
 2d_physics/layer_5="Shield"
 2d_physics/layer_6="Block"
+2d_physics/layer_7="Oneway"
 
 [rendering]
 

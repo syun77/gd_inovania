@@ -140,15 +140,13 @@ func update(delta: float) -> void:
 			_update_dead(delta)
 	
 	# デバッグ用更新.
-	_update_debug()
+	#_update_debug()
 	
 ## はしご接触数のカウント
 func increase_ladder_count() -> void:
 	_ladder_count += 1
-	print("ladder count:%d"%_ladder_count)
 func decrease_ladder_count() -> void:
 	_ladder_count -= 1
-	print("ladder count:%d"%_ladder_count)
 
 # ---------------------------------
 # private functions.
@@ -418,9 +416,12 @@ func _is_shield() -> bool:
 	
 ## 飛び降り判定.
 func _check_fall_through() -> bool:
-	if Input.is_action_pressed("action"):
-		if Input.is_action_pressed("ui_down"):
-			return true # 下＋ジャンプ.
+	if Input.is_action_pressed("ui_down"):
+		return true # 下.
+	
+	#if Input.is_action_pressed("action"):
+	#	if Input.is_action_pressed("ui_down"):
+	#		return true # 下＋ジャンプ.
 	return false
 	
 ## 左右移動の更新.

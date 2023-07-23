@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmnlpmg867u11"]
+
+[ext_resource type="Texture2D" uid="uid://di4qf0h4yf04a" path="res://assets/images/gimmick/oneway_floor.png" id="1_f7e3o"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_31kr2"]
+size = Vector2(60, 16)
+
+[node name="OnewayFloor" type="StaticBody2D"]
+collision_layer = 64
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_f7e3o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2, -24)
+shape = SubResource("RectangleShape2D_31kr2")
+one_way_collision = true
