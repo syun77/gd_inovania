@@ -96,6 +96,7 @@ func _create_obj_from_tile() -> void:
 					# ハシゴ.
 					var obj = LADDER_OBJ.instantiate()
 					obj.position = pos
+					#obj.z_index = -1
 					_bg_layer.add_child(obj)
 					Map.erase_cell_from_world(pos)
 					
@@ -110,7 +111,7 @@ func _create_obj_from_tile() -> void:
 ## 上を調べてコリジョンがなければ一方通行床を置く.
 ## @note ハシゴの後ろに隠れている一方通行床がチラチラ見える不具合がある.
 func _check_put_oneway(i:int, j:int) -> void:
-	#if i == 39 and j == 11:
+	#if i == 31 and j == 11:
 	#	return # ※[DEBUG]特定のタイルを強制的に除外.
 	
 	var pos = Map.grid_to_world(Vector2i(i, j))
