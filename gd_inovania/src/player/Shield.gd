@@ -19,6 +19,7 @@ var _timer_shield = 0.0
 # ------------------------------------------
 # public functions.
 # ------------------------------------------
+## 更新.
 func update(delta: float) -> void:
 	# シールドタイマーの更新.
 	if _timer_shield > 0.0:
@@ -30,12 +31,14 @@ func update(delta: float) -> void:
 # ------------------------------------------
 # private functions.
 # ------------------------------------------
+## 開始.
 func _ready() -> void:
 	_timer_shield = SHIELD_TIME
 
 # ------------------------------------------
 # signals.
 # ------------------------------------------
+## Body2Dと衝突.
 func _on_body_entered(body: Node2D) -> void:
 	if not body is Block:
 		return # 念のため.

@@ -14,9 +14,9 @@ const PARTICLE_INO_BLUE_OBJ = preload("res://src/particle/ParticleInoBlur.tscn")
 # consts.
 # ----------------------------------
 enum eType {
-	SIMPLE,
-	BLOCK,
-	INO_BLUR,
+	SIMPLE, # シンプルな丸パーティクル.
+	BLOCK, # ブロック破壊パーティクル.
+	INO_BLUR, # 残像.
 }
 const TBL = {
 	eType.SIMPLE: PARTICLE_OBJ,
@@ -27,6 +27,7 @@ const TBL = {
 # ----------------------------------
 # public functions.
 # ----------------------------------
+## パーティクル生成.
 static func add(pos:Vector2, type:eType, deg:float, speed:float, life:float, sc:float=1.0, delay:float=0.97) -> Particle:
 	var obj = TBL[type].instantiate() as Particle
 	# セットアップ.

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://baft2ivu8088b"]
 
-[ext_resource type="Texture2D" uid="uid://det6e6ha48hp8" path="res://assets/images/player.png" id="1_1hpxn"]
+[ext_resource type="Texture2D" uid="uid://chheu7t0waflt" path="res://assets/images/player.png" id="1_1hpxn"]
 [ext_resource type="Script" path="res://src/particle/ParticleInoBlur.gd" id="2_ajmuu"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_uub24"]

@@ -3,6 +3,7 @@ extends CharacterBody2D
 # プレイヤー.
 # =================================
 class_name Player
+
 # ---------------------------------
 # object.
 # ---------------------------------
@@ -21,6 +22,8 @@ const JUMP_SCALE_VAL_LANDING := 0.25
 ## ダッシュタイマー.
 const DASH_TIME = 0.05
 const DASH_SPEED_RATIO = 50.0 # ダッシュ速度倍率.
+## 登り壁のマージン(ギリギリまで移動させないようにするための値)
+const CLIMB_WALL_MARGIN = 32.0
 
 ## 状態.
 enum eState {
@@ -51,6 +54,8 @@ enum eJumpScale {
 @onready var _config:Config = preload("res://assets/config.tres")
 ## Sprite.
 @onready var _spr = $Sprite
+## 中心となるマーカー.
+@onready var _center = $Center
 ## デバッグ用ラベル.
 @onready var _label = $Label
 
@@ -91,8 +96,6 @@ var _jump_cnt_max = 1
 ## ダッシュ回数.
 var _dash_cnt = 0
 var _dash_cnt_max = 1
-## 獲得したアイテム.
-var _itemID:Map.eItem = Map.eItem.NONE
 ## はしご接触数.
 var _ladder_count = 0
 ## ダッシュタイマー.
@@ -112,19 +115,6 @@ func start() -> void:
 ## 死亡したかどうか.
 func is_dead() -> bool:
 	return _state == eState.DEAD
-	
-## アイテム獲得.
-func gain_item(id:Map.eItem) -> void:
-	_itemID = id
-	match _itemID:
-		Map.eItem.JUMP_UP:
-			_jump_cnt_max += 1 # ジャンプ最大数アップ.
-		Map.eItem.LIFE:
-			max_hp += 1 # 最大HP増加.
-			hp = max_hp # 最大まで回復.
-## アイテムをリセット.
-func reset_item() -> void:
-	_itemID = Map.eItem.NONE
 
 ## 更新.
 func update(delta: float) -> void:
@@ -280,11 +270,11 @@ func _update_moving(delta:float) -> void:
 	if _is_grabbing_ladder() or _is_climbing_wall():
 		# 上下ではしご移動 or 壁登り.
 		var v = Input.get_axis("ui_up", "ui_down")
+		velocity.y = 0
 		if v != 0:
 			velocity.x = 0 # X方向を止める.
-			velocity.y = 300 * v
-		else:
-			velocity.y = 0
+			if _can_climb(v):
+				velocity.y = _config.ladder_move_speed * v
 		if _is_climbing_wall():
 			# 壁のぼり中は左右移動できない.
 			can_move = false
@@ -646,6 +636,39 @@ func _is_on_wall() -> bool:
 func _is_climbing_wall() -> bool:
 	return _move_state == eMoveState.CLIMBING_WALL
 
+## 登り・降りるができるかどうか.
+func _can_climb(up_down:float) -> bool:
+	# マージン用に方向を決める.
+	var dir = 0.0
+	if up_down > 0:
+		dir = 1.0
+	elif up_down < 0:
+		dir = -1.0
+	
+	if _is_grabbing_ladder():
+		return true # ハシゴは常に可能.
+	if _is_climbing_wall():
+		# 登り壁.
+		var n = get_wall_normal() * -1 # 法線の逆.
+		# 前方1マスを調べる.
+		var center = center_position
+		var pos = Vector2()
+		pos.x = center.x + (n.x * Map.get_tile_size())
+		pos.y = center.y + up_down + (dir * CLIMB_WALL_MARGIN)
+		var grid_pos = Map.world_to_grid(pos)
+		print(grid_pos, ":cnt:", Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND))
+		if Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND) > 0:
+			# 壁がある.
+			var type = Map.get_floor_type(pos)
+			print("type:", type)
+			if type == Map.eType.CLIMBBING_WALL:
+				# 登り壁なら上下移動可能.
+				return true
+			else:
+				# それ以外は移動不可.
+				return false
+	return true
+
 ## 重力の影響を受ける移動状態かどうか.
 func _is_add_gravity() -> bool:
 	if _is_dash():
@@ -661,6 +684,7 @@ func _is_add_gravity() -> bool:
 func _update_debug() -> void:
 	_label.visible = true
 	_label.text = "move:%s"%(eMoveState.keys()[_move_state])
+
 # ---------------------------------
 # properties.
 # ---------------------------------
@@ -679,8 +703,7 @@ var max_hp:int = 0:
 		return max_hp
 	set(v):
 		max_hp = v
-
-## 獲得したアイテム.
-var itemID:Map.eItem:
+## 通信座標.
+var center_position:Vector2:
 	get:
-		return _itemID
+		return _center.global_position
