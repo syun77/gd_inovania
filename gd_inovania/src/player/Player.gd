@@ -656,11 +656,9 @@ func _can_climb(up_down:float) -> bool:
 		pos.x = center.x + (n.x * Map.get_tile_size())
 		pos.y = center.y + up_down + (dir * CLIMB_WALL_MARGIN)
 		var grid_pos = Map.world_to_grid(pos)
-		print(grid_pos, ":cnt:", Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND))
 		if Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND) > 0:
 			# 壁がある.
 			var type = Map.get_floor_type(pos)
-			print("type:", type)
 			if type == Map.eType.CLIMBBING_WALL:
 				# 登り壁なら上下移動可能.
 				return true
