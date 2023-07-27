@@ -131,6 +131,7 @@ func update(delta: float) -> void:
 	
 	# デバッグ用更新.
 	#_update_debug()
+	queue_redraw()
 	
 ## はしご接触数のカウント
 func increase_ladder_count() -> void:
@@ -347,7 +348,7 @@ func _start_jump(is_wall_jump:bool = false) -> void:
 	if is_wall_jump:
 		# 壁ジャンプは壁と反対側に移動させないと吸着してしまう.
 		var dir = get_wall_normal().x
-		_update_horizontal_moving(false, dir, 10.0)
+		_update_horizontal_moving(false, dir, 15.0)
 		if Input.is_action_pressed("ui_down"):
 			# 下押しながらの場合はY方向への移動はしない.
 			velocity.y = 0
@@ -652,10 +653,12 @@ func _can_climb(up_down:float) -> bool:
 		var n = get_wall_normal() * -1 # 法線の逆.
 		# 前方1マスを調べる.
 		var center = center_position
+		print("center:", center)
 		var pos = Vector2()
 		pos.x = center.x + (n.x * Map.get_tile_size())
 		pos.y = center.y + up_down + (dir * CLIMB_WALL_MARGIN)
 		var grid_pos = Map.world_to_grid(pos)
+		print("grid_pos:", grid_pos, " > ", Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND))
 		if Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND) > 0:
 			# 壁がある.
 			var type = Map.get_floor_type(pos)
@@ -665,6 +668,9 @@ func _can_climb(up_down:float) -> bool:
 			else:
 				# それ以外は移動不可.
 				return false
+		elif dir > 0:
+			# 下に何もない場合は移動不可.
+			return false
 	return true
 
 ## 重力の影響を受ける移動状態かどうか.
