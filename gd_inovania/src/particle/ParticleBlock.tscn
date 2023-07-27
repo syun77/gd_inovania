@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://btnv4hmfaarla"]
 
-[ext_resource type="Texture2D" uid="uid://bopxwwdeyc3l8" path="res://assets/images/gimmick/block.png" id="1_0hf7p"]
+[ext_resource type="Texture2D" uid="uid://hy4on12o7soa" path="res://assets/images/gimmick/block.png" id="1_0hf7p"]
 [ext_resource type="Script" path="res://src/particle/Particle.gd" id="2_qs76x"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_uub24"]

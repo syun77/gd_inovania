@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bmnlpmg867u11"]
 
-[ext_resource type="Texture2D" uid="uid://bpqh62jge2snv" path="res://assets/images/gimmick/oneway_floor.png" id="1_f7e3o"]
+[ext_resource type="Texture2D" uid="uid://di4qf0h4yf04a" path="res://assets/images/gimmick/oneway_floor.png" id="1_f7e3o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_31kr2"]
 size = Vector2(60, 16)

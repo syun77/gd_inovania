@@ -63,6 +63,14 @@ static func world_to_grid(world:Vector2, centered:bool=true) -> Vector2:
 	grid.x = world_to_grid_x(world.x, centered)
 	grid.y = world_to_grid_y(world.y, centered)
 	return grid
+## ワールド座標をグリッド座標に変換する.
+## @return Vector2i
+static func world_to_grid_vec2i(world:Vector2, centered:bool=true) -> Vector2i:
+	var grid = Vector2i()
+	# @note 小数部を四捨五入する.
+	grid.x = round(world_to_grid_x(world.x, centered))
+	grid.y = round(world_to_grid_y(world.y, centered))
+	return grid
 static func world_to_grid_x(wx:float, centered:bool) -> float:
 	var size = get_tile_size()
 	if centered:
@@ -167,6 +175,10 @@ static func _get_tile_set() -> TileSet:
 ## Physics Layerの数を取得する.	
 static func _get_physics_layers_count() -> int:
 	return _get_tile_set().get_physics_layers_count()
+	
+## Physics Layer Maskのビットフラグを取得する.
+static func _get_physics_layer_collision_mask(layer_index:int) -> int:
+	return _get_tile_set().get_physics_layer_collision_mask(layer_index)
 
 # --------------------------------------------------
 # properties.

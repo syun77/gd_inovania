@@ -653,12 +653,10 @@ func _can_climb(up_down:float) -> bool:
 		var n = get_wall_normal() * -1 # 法線の逆.
 		# 前方1マスを調べる.
 		var center = center_position
-		print("center:", center)
 		var pos = Vector2()
 		pos.x = center.x + (n.x * Map.get_tile_size())
 		pos.y = center.y + up_down + (dir * CLIMB_WALL_MARGIN)
-		var grid_pos = Map.world_to_grid(pos)
-		print("grid_pos:", grid_pos, " > ", Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND))
+		var grid_pos:Vector2i = Map.world_to_grid_vec2i(pos)
 		if Map.get_tile_collision_polygons_count(grid_pos, Map.eTileLayer.GROUND) > 0:
 			# 壁がある.
 			var type = Map.get_floor_type(pos)
