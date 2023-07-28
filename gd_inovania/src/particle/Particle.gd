@@ -8,9 +8,9 @@ class_name Particle
 # --------------------------------------------
 # vars.
 # --------------------------------------------
-var color = Color.WHITE
-var gravity = 9.8 * 2
-var rotate_speed = 10.0
+var color = Color.WHITE # 頂点カラー.
+var gravity = 9.8 * 2 # 重力.
+var rotate_speed = 10.0 # 回転速度.
 
 var _cnt = 0 # move呼び出し回数.
 var _anim_cnt = 0 # アニメーション用カウンタ.
@@ -19,7 +19,7 @@ var _speed = 0.0 # 移動速度.
 var _decay = 0.97 # 減衰率.
 var _life = 1.0 # 生存時間.
 var _timer = 0.0 # 経過時間.
-var _is_auto_destroy = true
+var _is_auto_destroy = true # 生存時間経過後に自動で消滅するかどうか.
 
 # --------------------------------------------
 # public functions.
@@ -113,4 +113,5 @@ func _update(delta:float) -> void:
 	
 	var rate = 1 - get_time_rate()
 	if rate < 0.5:
+		# 半分の時間経過で点滅開始.
 		visible = _anim_cnt%4 < 2

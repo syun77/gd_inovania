@@ -1,6 +1,7 @@
 extends CharacterBody2D
 # =================================
 # プレイヤー.
+# @todo ライフ回復やダメージ処理は不要なのでいずれ消す.
 # =================================
 class_name Player
 
@@ -27,9 +28,9 @@ const CLIMB_WALL_MARGIN = 32.0
 
 ## 状態.
 enum eState {
-	READY,
-	MAIN,
-	DEAD,
+	READY, # 開始の待ち.
+	MAIN, # メイン.
+	DEAD, # 死亡.
 }
 
 ## 移動状態.
@@ -42,7 +43,7 @@ enum eMoveState {
 
 ## ジャンプスケール.
 enum eJumpScale {
-	NONE,
+	NONE, # 何もしない.
 	JUMPING, # ジャンプ開始.
 	LANDING, # 着地開始.
 }
@@ -379,6 +380,7 @@ func _start_dash() -> void:
 	# ダッシュ方向を設定.
 	_dash_direction.x = Input.get_axis("ui_left", "ui_right")
 	_dash_direction.y = Input.get_axis("ui_up", "ui_down")
+	# 正規化.
 	_dash_direction = _dash_direction.normalized()
 	if _dash_direction.length() == 0:
 		# 入力がない場合は現在向いている方向にダッシュする.
@@ -387,7 +389,7 @@ func _start_dash() -> void:
 	# タイマー設定.
 	_timer_dash = DASH_TIME
 	
-	position.y -= 1 # 1px浮かす.
+	position.y -= 1 # すぐに着地してしまうので 1px 浮かす.
 	_move_state = eMoveState.AIR
 
 	# シールドを生成.
@@ -408,6 +410,8 @@ func _is_shield() -> bool:
 	return is_instance_valid(_shield)
 	
 ## 飛び降り判定.
+## @note 下キーのみで飛び降りるようにすると下ダッシュができない.
+##       ので別条件を追加した方が良いかも.
 func _check_fall_through() -> bool:
 	if Input.is_action_pressed("ui_down"):
 		return true # 下.

@@ -13,11 +13,14 @@ const PARTICLE_INO_BLUE_OBJ = preload("res://src/particle/ParticleInoBlur.tscn")
 # ----------------------------------
 # consts.
 # ----------------------------------
+## 種類.
 enum eType {
 	SIMPLE, # シンプルな丸パーティクル.
 	BLOCK, # ブロック破壊パーティクル.
 	INO_BLUR, # 残像.
 }
+
+## 生成テーブル.
 const TBL = {
 	eType.SIMPLE: PARTICLE_OBJ,
 	eType.BLOCK: PARTICLE_BLOCK_OBJ,
